@@ -1,2 +1,2 @@
-com\sam\person\PersonApplicationTests.class
-com\sam\person\model\CoinTest.class
+com\sam\coin\CoinApplicationTests.class
+com\sam\coin\model\CoinTest.class
