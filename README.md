@@ -257,6 +257,9 @@ PW: `password`
 
 ![Architecture](src/main/resources/Grafana_Dashboard.png)
 
+### [INFO] Fetching Coin Data
+- You may want to update coin information, for this purpose [crypto-client-poc](https://github.com/src-dbgr/crypto-client-poc) is available 
+
 ### [INFO] Start / Stop Stack
 - For simplicity I have added some simple batch scripts which start 
 - Stack contains: Postgres DB Docker Container, Spring Boot App Docker Container), Grafana Docker Container
