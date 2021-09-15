@@ -1,0 +1,10 @@
+2020-08-09 18:24:43.745  INFO 6188 --- [main] com.sam.coin.PersonApplication           : Starting PersonApplication on DESKTOP-LQGLRIM with PID 6188 (C:\Users\TheDude\Downloads\coin\target\classes started by TheDude in C:\Users\TheDude\Downloads\coin)
+2020-08-09 18:24:43.747  INFO 6188 --- [main] com.sam.coin.PersonApplication           : The following profiles are active: prod
+2020-08-09 18:24:44.868  INFO 6188 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2020-08-09 18:24:44.868  INFO 6188 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.37]
+2020-08-09 18:24:44.948  INFO 6188 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2020-08-09 18:24:45.331  INFO 6188 --- [main] com.sam.coin.PersonApplication           : Started PersonApplication in 2.041 seconds (JVM running for 2.434)
+2020-08-09 18:24:55.179  INFO 6188 --- [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2020-08-09 18:24:55.267  INFO 6188 --- [http-nio-8080-exec-2] com.sam.coin.api.PersonController        : Adding Person: Person [id=null, name=James Bond]
+2020-08-09 18:24:55.268  INFO 6188 --- [http-nio-8080-exec-2] c.s.c.dao.FakePersonDataAccessService    : Added Person to DB: Person [id=76470fcc-c1b7-43a3-9895-b95a1f46f025, name=James Bond]
+2020-08-09 18:24:55.268  INFO 6188 --- [http-nio-8080-exec-2] com.sam.coin.api.PersonController        : Added new Person: James Bond

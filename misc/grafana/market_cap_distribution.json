@@ -1,0 +1,819 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 8,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 11,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n(btc + coalesce(eth,0)+ coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as marketvolume,\n(coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as altcoin_cap,\nbtc, eth\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Market Cap Distribution",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {
+        "alt_percent": "dark-blue",
+        "btc_percent": "dark-yellow",
+        "eth_percent": "dark-green",
+        "market_percent": "dark-red",
+        "marketvolume": "rgb(6, 140, 235)"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 5,
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "hiddenSeries": false,
+      "id": 8,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 4,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {},
+        {
+          "alias": "btc",
+          "yaxis": 2
+        },
+        {
+          "alias": "marketvolume",
+          "yaxis": 2
+        },
+        {
+          "alias": "altcoincap",
+          "yaxis": 2
+        },
+        {
+          "alias": "eth",
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time, marketvolume/marketvolume*100 as market_percent, btc/marketvolume*100 as btc_percent, eth/marketvolume*100 as eth_percent, altcoincap/marketvolume*100 as alt_percent\nfrom (\nselect time,\n(btc + coalesce(eth,0) + coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as marketvolume,\n(coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as altcoincap,\nbtc,eth\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava) as caps",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Market Volume Percentage Distribution",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "percent",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "none",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": true,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 4,
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select (btc + coalesce(eth,0)+ coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as marketvolume,\n(coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as altcoinvolume,\nbtc, eth, link, dot, litecoin, card, stellar, zcash, algo, ampleforth, zilliqa, vechain, compound_ether,compound_coin,bitcoin_diamond,waves,uma,bzx_protocol,band_protocol,singularitynet,theta_token,thorchain,kava\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Market Cap Distribution Absolute",
+      "type": "bargauge"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 12,
+        "y": 25
+      },
+      "id": 9,
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select marketvolume/marketvolume as \"market_volume\",altcoinvolume/marketvolume \"alt_volume\", btc/marketvolume as \"btc_volume\", eth/marketvolume as \"eth_volume\", link/marketvolume as \"link_volume\", dot/marketvolume as \"dot_volume\", litecoin/marketvolume as \"litecoin_volume\", card/marketvolume as \"card_volume\", stellar/marketvolume as \"stellar_volume\", zcash/marketvolume as \"zcash_volume\", algo/marketvolume as \"algo_volume\", ampleforth/marketvolume as \"ampleforth_volume\", zilliqa/marketvolume as \"zilliqa_volume\", vechain/marketvolume as \"vechain_volume\", compound_ether/marketvolume as \"compound_ether_volume\",compound_coin/marketvolume as \"compound_coin_volume\",bitcoin_diamond/marketvolume as \"bitcoin_diamond_volume\",waves/marketvolume as \"waves_volume\",uma/marketvolume as \"uma_volume\",bzx_protocol/marketvolume as \"bzx_protocol_volume\",band_protocol/marketvolume as \"band_protocol_volume\",singularitynet/marketvolume as \"singularitynet_volume\",theta_token/marketvolume as \"theta_token_volume\",thorchain/marketvolume as \"thorchain_volume\",kava/marketvolume as \"kava_volume\"\nfrom (\nselect (btc + coalesce(eth,0)+ coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as marketvolume,\n(coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as altcoinvolume,\nbtc, eth, link, dot, litecoin, card, stellar, zcash, algo, ampleforth, zilliqa, vechain, compound_ether,compound_coin,bitcoin_diamond,waves,uma,bzx_protocol,band_protocol,singularitynet,theta_token,thorchain,kava\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava) as aggregat",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Market Cap Distribution Percent",
+      "type": "bargauge"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 23,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null as zero",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n(btc + coalesce(eth,0)+ coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as marketvolume,\n(coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as altcoin_cap,\nbtc, eth, link, dot, litecoin, card, stellar, zcash, algo, ampleforth, zilliqa, vechain, compound_ether,compound_coin,bitcoin_diamond,waves,uma,bzx_protocol,band_protocol,singularitynet,theta_token,thorchain,kava\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Market Cap Overview",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "locale",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 22,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "hiddenSeries": false,
+      "id": 6,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n(coalesce(card,0) + coalesce(zcash,0) + coalesce(link,0) + coalesce(dot,0) + coalesce(stellar,0) + coalesce(algo,0) + coalesce(ampleforth,0) + coalesce(zilliqa,0) + coalesce(vechain,0) + coalesce(litecoin,0) + coalesce(compound_ether,0) + coalesce(compound_coin,0) + coalesce(bitcoin_diamond,0) + coalesce(waves,0) + coalesce(uma,0) + coalesce(bzx_protocol,0) + coalesce(band_protocol,0) + coalesce(singularitynet,0) + coalesce(theta_token,0) + coalesce(thorchain,0) + coalesce(kava,0)) as alt_marketvolume,\nlink, dot, litecoin, card, stellar, zcash, algo, ampleforth, zilliqa, vechain, compound_ether,compound_coin,bitcoin_diamond,waves,uma,bzx_protocol,band_protocol,singularitynet,theta_token,thorchain,kava\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Altcoin Market Cap",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 31,
+        "w": 24,
+        "x": 0,
+        "y": 88
+      },
+      "hiddenSeries": false,
+      "id": 13,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\nlink, dot, litecoin, card, stellar, zcash, algo, ampleforth, zilliqa, vechain, compound_ether,compound_coin,bitcoin_diamond,waves,uma,bzx_protocol,band_protocol,singularitynet,theta_token,thorchain,kava\nfrom\n(select time_stamp as \"time\", market_cap_eur as \"btc\", (row_number() OVER(order by time_stamp desc)) as \"counterbtc\" from coins order by counterbtc desc) as bitcoin\nLEFT JOIN\n(select market_cap_eur as \"eth\", (row_number() OVER(order by time_stamp desc)) as \"countereth\" from ethereum order by countereth desc) as ethereum\non counterbtc = countereth\nLEFT JOIN\n(select market_cap_eur as \"card\", (row_number() OVER(order by time_stamp desc)) as \"countercard\" from cardano order by countercard desc) as cardano\non counterbtc = countercard\nLEFT JOIN\n(select market_cap_eur as \"zcash\", (row_number() OVER(order by time_stamp desc)) as \"counterzcash\" from zcash order by counterzcash desc) as zcash\non counterbtc = counterzcash\nLEFT JOIN\n(select market_cap_eur as \"link\", (row_number() OVER(order by time_stamp desc)) as \"counterlink\" from chainlink order by counterlink desc) as link\non counterbtc = counterlink\nLEFT JOIN\n(select market_cap_eur as \"dot\", (row_number() OVER(order by time_stamp desc)) as \"counterdot\" from polkadot order by counterdot desc) as dot\non counterbtc = counterdot\nLEFT JOIN\n(select market_cap_eur as \"stellar\", (row_number() OVER(order by time_stamp desc)) as \"counterstellar\" from stellar order by counterstellar desc) as stellar\non counterbtc = counterstellar\nLEFT JOIN\n(select market_cap_eur as \"algo\", (row_number() OVER(order by time_stamp desc)) as \"counteralgo\" from algorand order by counteralgo desc) as algo\non counterbtc = counteralgo\nLEFT JOIN\n(select market_cap_eur as \"ampleforth\", (row_number() OVER(order by time_stamp desc)) as \"counterampleforth\" from ampleforth order by counterampleforth desc) as ampleforth\non counterbtc = counterampleforth\nLEFT JOIN\n(select market_cap_eur as \"zilliqa\", (row_number() OVER(order by time_stamp desc)) as \"counterzilliqa\" from zilliqa order by counterzilliqa desc) as zilliqa\non counterbtc = counterzilliqa\nLEFT JOIN\n(select market_cap_eur as \"vechain\", (row_number() OVER(order by time_stamp desc)) as \"countervechain\" from vechain order by countervechain desc) as vechain\non counterbtc = countervechain\nLEFT JOIN\n(select market_cap_eur as \"litecoin\", (row_number() OVER(order by time_stamp desc)) as \"counterlitecoin\" from litecoin order by counterlitecoin desc) as litecoin\non counterbtc = counterlitecoin\nLEFT JOIN\n(select market_cap_eur as \"compound_ether\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_ether\" from compound_ether order by countercompound_ether desc) as compound_ether\non counterbtc = countercompound_ether\nLEFT JOIN\n(select market_cap_eur as \"compound_coin\", (row_number() OVER(order by time_stamp desc)) as \"countercompound_coin\" from compound_coin order by countercompound_coin desc) as compound_coin\non counterbtc = countercompound_coin\nLEFT JOIN\n(select market_cap_eur as \"bitcoin_diamond\", (row_number() OVER(order by time_stamp desc)) as \"counterbitcoin_diamond\" from bitcoin_diamond order by counterbitcoin_diamond desc) as bitcoin_diamond\non counterbtc = counterbitcoin_diamond\nLEFT JOIN\n(select market_cap_eur as \"waves\", (row_number() OVER(order by time_stamp desc)) as \"counterwaves\" from waves order by counterwaves desc) as waves\non counterbtc = counterwaves\nLEFT JOIN\n(select market_cap_eur as \"uma\", (row_number() OVER(order by time_stamp desc)) as \"counteruma\" from uma order by counteruma desc) as uma\non counterbtc = counteruma\nLEFT JOIN\n(select market_cap_eur as \"bzx_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterbzx_protocol\" from bzx_protocol order by counterbzx_protocol desc) as bzx_protocol\non counterbtc = counterbzx_protocol\nLEFT JOIN\n(select market_cap_eur as \"band_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterband_protocol\" from band_protocol order by counterband_protocol desc) as band_protocol\non counterbtc = counterband_protocol\nLEFT JOIN\n(select market_cap_eur as \"ocean_protocol\", (row_number() OVER(order by time_stamp desc)) as \"counterocean_protocol\" from ocean_protocol order by counterocean_protocol desc) as ocean_protocol\non counterbtc = counterocean_protocol\nLEFT JOIN\n(select market_cap_eur as \"singularitynet\", (row_number() OVER(order by time_stamp desc)) as \"countersingularitynet\" from singularitynet order by countersingularitynet desc) as singularitynet\non counterbtc = countersingularitynet\nLEFT JOIN\n(select market_cap_eur as \"theta_token\", (row_number() OVER(order by time_stamp desc)) as \"countertheta_token\" from theta_token order by countertheta_token desc) as theta_token\non counterbtc = countertheta_token\nLEFT JOIN\n(select market_cap_eur as \"thorchain\", (row_number() OVER(order by time_stamp desc)) as \"counterthorchain\" from thorchain order by counterthorchain desc) as thorchain\non counterbtc = counterthorchain\nLEFT JOIN\n(select market_cap_eur as \"kava\", (row_number() OVER(order by time_stamp desc)) as \"counterkava\" from kava order by counterkava desc) as kava\non counterbtc = counterkava",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Altcoin Market Cap",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2015-08-07T00:00:00.000Z",
+    "to": "2020-09-06T20:41:00.000Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Market Cap Distribution",
+  "uid": "QkW9nYDMz",
+  "version": 3
+}

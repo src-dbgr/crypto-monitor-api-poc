@@ -1,0 +1,16 @@
+com\sam\person\api\EntranceController.class
+com\sam\person\dao\PersonDataAccessService.class
+com\sam\person\model\Coin.class
+com\sam\person\PersonApplication.class
+com\sam\person\api\PersonController.class
+com\sam\person\dao\CoinDataAccessService.class
+com\sam\person\dao\FakePersonDataAccessService.class
+com\sam\person\api\CoinController.class
+com\sam\person\service\PersonService.class
+com\sam\person\dao\PersonDao.class
+com\sam\person\dao\CoinDao.class
+com\sam\person\model\Person.class
+com\sam\person\datasource\PostgresDatasource.class
+com\sam\person\service\CoinService.class
+com\sam\person\model\DeactivatedCoin.class
+com\sam\person\model\DeactivatedCoin$Info.class

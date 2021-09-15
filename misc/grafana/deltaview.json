@@ -1,0 +1,1297 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 4,
+  "iteration": 1599166273829,
+  "links": [],
+  "panels": [
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 4,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  time_stamp as \"time\",\n  price_eur as \"Price EUR_____\",\n  price_usd as \"Price USD_____\",\n  market_cap_eur as \"Market CAP EUR_____\",\n  market_cap_eur as \"Market CAP USD_____ \"\nFROM\n  \"$Coin\"\nORDER BY time_stamp asc\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Current Price",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 4,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eurb\" as \"Old Price EUR\",\n\"$Coin usdb\" as \"Old Price USD\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  price_usd as \"$Coin usdb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - $DeltaDifference) as \"countertwobone\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur,price_usd\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobone\nORDER BY countertwo ASC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Old Price",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 4,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 18,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"EUR Entry Delta\",\n\"$Coin usd\" - \"$Coin usdb\" as \"USD Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  price_usd as \"$Coin usd\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur,price_usd\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  price_usd as \"$Coin usdb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - $DeltaDifference) as \"countertwobone\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur,price_usd\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobone\nORDER BY countertwo ASC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Delta",
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "/.*/",
+          "values": true
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select \nage(time,timeb) as \"Compare Age Diff timestamp\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - $DeltaDifference) as \"countertwobone\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobone\nWHERE counter = 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Diff between Now and Compare Date",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "decimals": 4,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 2,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "first"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"$DeltaDifference Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - $DeltaDifference) as \"countertwobone\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobone\nORDER BY countertwo ASC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"2 Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) -  2) as \"countertwobtwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobtwo\nORDER BY countertwo ASC",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"3 Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - 3) as \"countertwobthree\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobthree\nORDER BY countertwo ASC",
+          "refId": "C",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"4 Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - 4) as \"countertwobfour\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobfour\nORDER BY countertwo ASC",
+          "refId": "D",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"5 Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - 5) as \"countertwobfive\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobfive\nORDER BY countertwo ASC",
+          "refId": "E",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"7 Entry Delta\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - 7) as \"countertwobseven\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobseven\nORDER BY countertwo ASC",
+          "refId": "F",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Price Delta EUR",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {}
+        }
+      ],
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "decimals": 3,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 12,
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Entry #"
+          }
+        ]
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select \n\"countertwo\" as \"Entry #\",\ntime as \"actual time\",\ntimeb as \"compare time\",\n\"$Coin eur\" as \"Price $Coin\",\n\"$Coin eurb\" as \"Price Delta Diff Entry $Coin\",\n\"$Coin eur\" - \"$Coin eurb\" as \"$DeltaDifference Entry Delta\",\nage(time,timeb) as \"Compare Age Diff timestamp\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - $DeltaDifference) as \"countertwobone\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobone",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Compare Delta",
+      "type": "table"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "hiddenSeries": false,
+      "id": 8,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Price Performance",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 20,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "hiddenSeries": false,
+      "id": 6,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select time,\n\"$Coin eur\" - \"$Coin eurb\" as \"$DeltaDifference Entry Delta\",\n\"$Coin eur\"\nFrom(select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableA\nINNER JOIN (select\n  time_stamp as \"timeb\",\n  price_eur as \"$Coin eurb\",\n  market_cap_eur as \"$Coin market cap eurb\",\n  market_cap_eur / price_eur as \"$Coin # of coinsb\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entryb\",\n  (row_number() OVER(order by time_stamp desc)) as \"counterb\",\n  (row_number() OVER(order by time_stamp desc) - $DeltaDifference) as \"countertwobone\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp asc) AS derivedTableB\nON counter = countertwobone",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Delta to Delta Diff Entry",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 70
+      },
+      "id": 4,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "select\n  time_stamp as \"time\",\n  price_eur as \"$Coin eur\",\n  market_cap_eur as \"$Coin market cap eur\",\n  market_cap_eur / price_eur as \"$Coin # of coins\",\n  (row_number() OVER(order by time_stamp)) as \"# Database Entry\",\n  time_stamp::date as \"date\",\n  (row_number() OVER(order by time_stamp desc)) as \"counter\",\n  (row_number() OVER(order by time_stamp desc) - 1) as \"countertwo\",\n  (to_char(current_date,'yyyymmdd')::bigint - (row_number() OVER(order by time_stamp desc))) as \"deltadate\"\nfrom \"$Coin\"\ngroup by time_stamp,price_eur,market_cap_eur\norder by time_stamp Desc",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Price EUR",
+      "type": "table"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": "ampleforth",
+          "value": "ampleforth"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "Coin",
+        "options": [
+          {
+            "selected": false,
+            "text": "ethereum",
+            "value": "ethereum"
+          },
+          {
+            "selected": false,
+            "text": "coins",
+            "value": "coins"
+          },
+          {
+            "selected": false,
+            "text": "cardano",
+            "value": "cardano"
+          },
+          {
+            "selected": false,
+            "text": "zcash",
+            "value": "zcash"
+          },
+          {
+            "selected": false,
+            "text": "chainlink",
+            "value": "chainlink"
+          },
+          {
+            "selected": false,
+            "text": "polkadot",
+            "value": "polkadot"
+          },
+          {
+            "selected": false,
+            "text": "stellar",
+            "value": "stellar"
+          },
+          {
+            "selected": false,
+            "text": "algorand",
+            "value": "algorand"
+          },
+          {
+            "selected": true,
+            "text": "ampleforth",
+            "value": "ampleforth"
+          },
+          {
+            "selected": false,
+            "text": "zilliqa",
+            "value": "zilliqa"
+          },
+          {
+            "selected": false,
+            "text": "vechain",
+            "value": "vechain"
+          },
+          {
+            "selected": false,
+            "text": "bitcoin_diamond",
+            "value": "bitcoin_diamond"
+          },
+          {
+            "selected": false,
+            "text": "litecoin",
+            "value": "litecoin"
+          },
+          {
+            "selected": false,
+            "text": "compound_ether",
+            "value": "compound_ether"
+          },
+          {
+            "selected": false,
+            "text": "compound_coin",
+            "value": "compound_coin"
+          },
+          {
+            "selected": false,
+            "text": "waves",
+            "value": "waves"
+          },
+          {
+            "selected": false,
+            "text": "uma",
+            "value": "uma"
+          },
+          {
+            "selected": false,
+            "text": "bzx_protocol",
+            "value": "bzx_protocol"
+          },
+          {
+            "selected": false,
+            "text": "band_protocol",
+            "value": "band_protocol"
+          },
+          {
+            "selected": false,
+            "text": "ocean_protocol",
+            "value": "ocean_protocol"
+          },
+          {
+            "selected": false,
+            "text": "singularitynet",
+            "value": "singularitynet"
+          },
+          {
+            "selected": false,
+            "text": "theta_token",
+            "value": "theta_token"
+          },
+          {
+            "selected": false,
+            "text": "thorchain",
+            "value": "thorchain"
+          },
+          {
+            "selected": false,
+            "text": "kava",
+            "value": "kava"
+          }
+        ],
+        "query": "ethereum,coins,cardano,zcash,chainlink,polkadot,stellar,algorand,ampleforth,zilliqa,vechain,bitcoin_diamond,litecoin,compound_ether,compound_coin,waves,uma,bzx_protocol,band_protocol,ocean_protocol,singularitynet,theta_token,thorchain,kava",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "selected": true,
+          "text": "1",
+          "value": "1"
+        },
+        "hide": 0,
+        "label": null,
+        "name": "DeltaDifference",
+        "options": [
+          {
+            "selected": true,
+            "text": "1",
+            "value": "1"
+          },
+          {
+            "selected": false,
+            "text": "2",
+            "value": "2"
+          },
+          {
+            "selected": false,
+            "text": "3",
+            "value": "3"
+          },
+          {
+            "selected": false,
+            "text": "4",
+            "value": "4"
+          },
+          {
+            "selected": false,
+            "text": "5",
+            "value": "5"
+          },
+          {
+            "selected": false,
+            "text": "6",
+            "value": "6"
+          },
+          {
+            "selected": false,
+            "text": "7",
+            "value": "7"
+          },
+          {
+            "selected": false,
+            "text": "8",
+            "value": "8"
+          },
+          {
+            "selected": false,
+            "text": "9",
+            "value": "9"
+          },
+          {
+            "selected": false,
+            "text": "10",
+            "value": "10"
+          },
+          {
+            "selected": false,
+            "text": "11",
+            "value": "11"
+          },
+          {
+            "selected": false,
+            "text": "12",
+            "value": "12"
+          },
+          {
+            "selected": false,
+            "text": "13",
+            "value": "13"
+          },
+          {
+            "selected": false,
+            "text": "14",
+            "value": "14"
+          },
+          {
+            "selected": false,
+            "text": "15",
+            "value": "15"
+          },
+          {
+            "selected": false,
+            "text": "16",
+            "value": "16"
+          },
+          {
+            "selected": false,
+            "text": "17",
+            "value": "17"
+          },
+          {
+            "selected": false,
+            "text": "18",
+            "value": "18"
+          },
+          {
+            "selected": false,
+            "text": "19",
+            "value": "19"
+          },
+          {
+            "selected": false,
+            "text": "20",
+            "value": "20"
+          },
+          {
+            "selected": false,
+            "text": "30",
+            "value": "30"
+          },
+          {
+            "selected": false,
+            "text": "35",
+            "value": "35"
+          },
+          {
+            "selected": false,
+            "text": "40",
+            "value": "40"
+          },
+          {
+            "selected": false,
+            "text": "45",
+            "value": "45"
+          },
+          {
+            "selected": false,
+            "text": "50",
+            "value": "50"
+          },
+          {
+            "selected": false,
+            "text": "55",
+            "value": "55"
+          },
+          {
+            "selected": false,
+            "text": "60",
+            "value": "60"
+          },
+          {
+            "selected": false,
+            "text": "65",
+            "value": "65"
+          },
+          {
+            "selected": false,
+            "text": "70",
+            "value": "70"
+          },
+          {
+            "selected": false,
+            "text": "75",
+            "value": "75"
+          },
+          {
+            "selected": false,
+            "text": "80",
+            "value": "80"
+          },
+          {
+            "selected": false,
+            "text": "90",
+            "value": "90"
+          },
+          {
+            "selected": false,
+            "text": "100",
+            "value": "100"
+          },
+          {
+            "selected": false,
+            "text": "110",
+            "value": "110"
+          },
+          {
+            "selected": false,
+            "text": "120",
+            "value": "120"
+          }
+        ],
+        "query": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,35,40,45,50,55,60,65,70,75,80,90,100,110,120",
+        "queryValue": "",
+        "refresh": 2,
+        "skipUrlSync": false,
+        "type": "interval"
+      }
+    ]
+  },
+  "time": {
+    "from": "2015-08-08T00:00:00.000Z",
+    "to": "2020-09-04T02:19:47.000Z"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Table View",
+  "uid": "n2qzBpDMz",
+  "version": 11
+}
