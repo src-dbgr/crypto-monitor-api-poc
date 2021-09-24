@@ -195,7 +195,42 @@ PW: `password`
   - Create a new POST Request
   - enter `localhost:8080/api/v1/coin`
   - paste the following content into the Body field:
-  - `{ "id" : "24649f69-f963-4358-8df5-7716cd5ca520", "timestamp" : 1631728657000, "symbol" : "algo", "coinId" : "algorand", "coinName" : "Algorand", "priceEur" : 1.75, "priceUsd" : 2.06, "priceBtc" : 0.00004278, "priceEth" : 0.00058266, "marketCapEur" : 9129540478.621513, "marketCapUsd" : 10782459113.315432, "marketCapBtc" : 223272.92629636533, "marketCapEth" : 3044854.898276552, "totalVolumeEur" : 630063059.8750135, "totalVolumeUsd" : 744086064.2790741, "totalVolumeBtc" : 15443.646497872505, "totalVolumeEth" : 210319.25611616662, "twitterFollowers" : 0, "redditAvgPosts48Hours" : null, "redditAvgComments48Hours" : null, "redditAccountsActive48Hours" : null, "redditSubscribers" : 0, "devForks" : 0, "devStars" : 0, "devTotalIssues" : 0, "devClosedIssues" : 0, "devPullRequestsMerged" : 0, "devPullRequestContributors" : 0, "devCommitCount4Weeks" : 0, "devCodeAdditions4Weeks" : 0, "devCodeDeletions4Weeks" : 0, "publicAlexaRank" : 0 }`
+```
+{
+   "id":"24649f69-f963-4358-8df5-7716cd5ca520",
+   "timestamp":1631728657000,
+   "symbol":"algo",
+   "coinId":"algorand",
+   "coinName":"Algorand",
+   "priceEur":1.75,
+   "priceUsd":2.06,
+   "priceBtc":0.00004278,
+   "priceEth":0.00058266,
+   "marketCapEur":9129540478.621513,
+   "marketCapUsd":10782459113.315432,
+   "marketCapBtc":223272.92629636533,
+   "marketCapEth":3044854.898276552,
+   "totalVolumeEur":630063059.8750135,
+   "totalVolumeUsd":744086064.2790741,
+   "totalVolumeBtc":15443.646497872505,
+   "totalVolumeEth":210319.25611616662,
+   "twitterFollowers":0,
+   "redditAvgPosts48Hours":null,
+   "redditAvgComments48Hours":null,
+   "redditAccountsActive48Hours":null,
+   "redditSubscribers":0,
+   "devForks":0,
+   "devStars":0,
+   "devTotalIssues":0,
+   "devClosedIssues":0,
+   "devPullRequestsMerged":0,
+   "devPullRequestContributors":0,
+   "devCommitCount4Weeks":0,
+   "devCodeAdditions4Weeks":0,
+   "devCodeDeletions4Weeks":0,
+   "publicAlexaRank":0
+}
+```
 - Pray :D, now if everything worked fine, you should receive a 200 response, and a new entry should be made into the Postgres DB table "algorand"
 
 ### [IMPORTANT] Refresh pgadmin to verify if the DB scripts have been applied
