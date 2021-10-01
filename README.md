@@ -4,7 +4,7 @@
 
 ## Purpose of this application
 
-- This application is part of a POC which aims the at following
+- This application is part of a POC which aims at the following
   - Connecting multiple Docker-based services to establish a data source for Grafana dashboards where monitoring of cryptocurrency information shall take place
   - This Maven-based Spring Boot backend application shall provide a REST API that handles CRUD operations persisted in a PostgreSQL database for Cryptocurrency information such as price performance over time
   - For price updates, a separate crypto client is in place (the client is covered separately), which serves as the man in the middle between the cryptocurrency web service (in this case, coingecko.com) and this Spring Boot backend server
