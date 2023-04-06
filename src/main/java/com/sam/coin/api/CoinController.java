@@ -51,9 +51,19 @@ public class CoinController {
 		coinService.deleteCoinByID(id);
 	}
 
-	@GetMapping(path = "{id}")
-	public Optional<Coin> getCoinById(@PathVariable("id") UUID id) {
-		return coinService.getCoinByID(id);
+	@GetMapping(path = "{table}/id/{id}")
+	public Optional<Coin> selectCoinByTableNameAndId(@PathVariable("table") String tableName, @PathVariable("id") UUID id) {
+		return coinService.selectCoinByTableNameAndId(tableName, id);
+	}
+
+	// Date Pattern yyyy-mm-dd
+	// 2020-09-04 <- 4th September of 2020
+	@GetMapping(path = "{table}/date/{date}")
+	public List<Coin> selectCoinByTableNameAndId(@PathVariable("table") String tableName, @PathVariable("date") String date) {
+		List<Coin> coins = coinService.selectCoinByTableNameAndDate(tableName, date);
+		System.out.println("\n\n");
+		System.out.println(coins.toString());
+		return coins;
 	}
 
 	@PutMapping(path = "{id}")

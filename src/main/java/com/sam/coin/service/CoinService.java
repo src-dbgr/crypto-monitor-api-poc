@@ -38,9 +38,18 @@ public class CoinService {
 		return coinDao.deleteCoinByID(id);
 	}
 
-	public Optional<Coin> getCoinByID(UUID id) {
-		LOG.info("Getting Coin with ID: " + id);
-		return coinDao.selectCoinById(id);
+	public Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id) {
+		LOG.info("Getting Coin with ID: " + id + " and Table: " + tableName);
+		Optional<Coin> coin = coinDao.selectCoinByTableNameAndId(tableName, id);
+		LOG.info(coin.get().toString());
+		return coin;
+	}
+
+	public List<Coin> selectCoinByTableNameAndDate(String tableName, String date) {
+		LOG.info("Getting Coin with date: " + date + " and Table: " + tableName);
+		List<Coin> coins = coinDao.selectCoinByTableNameAndDate(tableName, date);
+		LOG.info(coins.toString());
+		return coins;
 	}
 
 	public boolean updateCoin(UUID id, Coin newCoin) {
