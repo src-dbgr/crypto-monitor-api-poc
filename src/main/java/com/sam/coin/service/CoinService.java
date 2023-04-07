@@ -52,6 +52,16 @@ public class CoinService {
 		return coins;
 	}
 
+	public List<Coin> getAllDuplicatesWithSameDate(String tableName) {
+		LOG.info("Get duplicates with Table: " + tableName);
+		return coinDao.getAllDuplicatesWithSameDate(tableName);
+	}
+
+	public int deleteDuplicatesWithSameDate(String tableName) {
+		LOG.info("Delete duplicates with Table: " + tableName);
+		return coinDao.deleteDuplicatesWithSameDate(tableName);
+	}
+
 	public boolean updateCoin(UUID id, Coin newCoin) {
 		LOG.info("Updating Coin with ID: " + id);
 		return coinDao.updateCoinByID(id, newCoin);

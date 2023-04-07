@@ -5,26 +5,30 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.sam.coin.model.Coin;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForZonedDateTime;
 
 public interface CoinDao {
 
-	boolean insertCoin(UUID id, Coin coin);
+    boolean insertCoin(UUID id, Coin coin);
 
-	default boolean insertCoin(Coin coin) {
-		UUID id = UUID.randomUUID();
-		return insertCoin(id, coin);
-	}
+    default boolean insertCoin(Coin coin) {
+        UUID id = UUID.randomUUID();
+        return insertCoin(id, coin);
+    }
 
-	List<Coin> selectAllCoins();
+    List<Coin> selectAllCoins();
 
-	Optional<Coin> selectCoinById(UUID id);
+    Optional<Coin> selectCoinById(UUID id);
 
-	Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id);
-	List<Coin> selectCoinByTableNameAndDate(String tableName, String date);
+    Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id);
 
-	boolean deleteCoinByID(UUID id);
+    List<Coin> selectCoinByTableNameAndDate(String tableName, String date);
 
-	boolean updateCoinByID(UUID id, Coin coin);
+    List<Coin> getAllDuplicatesWithSameDate(String tableName);
+
+    int deleteDuplicatesWithSameDate(String tableName);
+
+    boolean deleteCoinByID(UUID id);
+
+    boolean updateCoinByID(UUID id, Coin coin);
 
 }

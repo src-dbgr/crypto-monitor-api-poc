@@ -33,21 +33,21 @@ public class CoinDataAccessService implements CoinDao {
 
     private static String SELECT_ALL_DUPLICATES_WITH_SAME_DATE =
             "SELECT * FROM {table_name} " +
-            "WHERE DATE(time_stamp) IN (" +
-            "   SELECT DATE(time_stamp)" +
-            "   FROM {table_name}" +
-            "   GROUP BY DATE(time_stamp)" +
-            "   HAVING COUNT(*) > 1)" +
-            " ORDER BY time_stamp";
+                    "WHERE DATE(time_stamp) IN (" +
+                    "   SELECT DATE(time_stamp)" +
+                    "   FROM {table_name}" +
+                    "   GROUP BY DATE(time_stamp)" +
+                    "   HAVING COUNT(*) > 1)" +
+                    " ORDER BY time_stamp DESC;";
 
     // Danger, this deletes all duplicates from db
     private static String DELETE_ALL_DUPLICATES_WITH_SAME_DATE =
-            "DELETE FROM {table_name}" +
-            "WHERE ctid NOT IN (" +
-            "  SELECT DISTINCT ON (DATE(time_stamp)) ctid" +
-            "  FROM {table_name}" +
-            "  ORDER BY DATE(time_stamp), ctid" +
-            ")";
+            "DELETE FROM {table_name} " +
+                    "WHERE ctid NOT IN (" +
+                    "  SELECT DISTINCT ON (DATE(time_stamp)) ctid" +
+                    "  FROM {table_name}" +
+                    "  ORDER BY DATE(time_stamp), ctid" +
+                    ")";
 
 
     //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp) VALUES (?, ?, ?)";
@@ -168,6 +168,26 @@ public class CoinDataAccessService implements CoinDao {
         SELECT_COIN_BY_TABLE_AND_DATE_QUERY = SELECT_COIN_BY_TABLE_AND_DATE_QUERY.replace("{date}", date);
         System.out.println("SELECT_COIN_BY_ID 2st Replace :" + SELECT_COIN_BY_TABLE_AND_DATE_QUERY);
         return queryCoin(SELECT_COIN_BY_TABLE_AND_DATE_QUERY);
+    }
+
+    @Override
+    public int deleteDuplicatesWithSameDate(String tableName) {
+        String DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = DELETE_ALL_DUPLICATES_WITH_SAME_DATE;
+        DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY.replace("{table_name}", tableName);
+        System.out.println("SELECT_COIN_BY_ID 1st Replace :" + DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
+        int updatedRows = jdbcTemplate.update(DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
+        LOG.info("Updated {} rows.", updatedRows);
+        return updatedRows;
+    }
+
+    @Override
+    public List<Coin> getAllDuplicatesWithSameDate(String tableName) {
+        String SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = SELECT_ALL_DUPLICATES_WITH_SAME_DATE;
+        SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY.replace("{table_name}", tableName);
+        System.out.println("SELECT_COIN_BY_ID 1st Replace :" + SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
+        List<Coin> duplicateCoins = queryCoin(SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
+        LOG.info("Contains {} Entries with same date.", duplicateCoins.size());
+        return duplicateCoins;
     }
 
     private List<Coin> queryCoin(String query) {

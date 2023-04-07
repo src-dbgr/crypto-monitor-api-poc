@@ -1,8 +1,6 @@
 package com.sam.coin.api;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import javax.validation.Valid;
 
@@ -59,11 +57,25 @@ public class CoinController {
 	// Date Pattern yyyy-mm-dd
 	// 2020-09-04 <- 4th September of 2020
 	@GetMapping(path = "{table}/date/{date}")
-	public List<Coin> selectCoinByTableNameAndId(@PathVariable("table") String tableName, @PathVariable("date") String date) {
+	public List<Coin> selectCoinByTableNameAndDate(@PathVariable("table") String tableName, @PathVariable("date") String date) {
 		List<Coin> coins = coinService.selectCoinByTableNameAndDate(tableName, date);
 		System.out.println("\n\n");
 		System.out.println(coins.toString());
 		return coins;
+	}
+	@GetMapping(path = "{table}/duplicates")
+	public Map<Integer, List<Coin>> getAllDuplicatesWithSameDate(@PathVariable("table") String tableName) {
+		List<Coin> coins = coinService.getAllDuplicatesWithSameDate(tableName);
+		System.out.println("\n\n");
+		System.out.println(coins.toString());
+		HashMap<Integer, List<Coin>> result = new HashMap<>();
+		result.put(coins.size(), coins);
+		return result;
+	}
+
+	@DeleteMapping(path = "{table}/duplicates")
+	public int deleteDuplicatesWithSameDate(@PathVariable("table") String tableName) {
+		return coinService.deleteDuplicatesWithSameDate(tableName);
 	}
 
 	@PutMapping(path = "{id}")
