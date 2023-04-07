@@ -1,8 +1,6 @@
 package com.sam.coin.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +34,10 @@ public class CoinService {
 	public boolean deleteCoinByID(UUID id) {
 		LOG.info("Deleting Coin with ID: " + id);
 		return coinDao.deleteCoinByID(id);
+	}
+
+	public Map<String, Integer> countAllEntries(){
+		return coinDao.countAllEntries();
 	}
 
 	public Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id) {

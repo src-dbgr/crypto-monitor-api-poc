@@ -1,16 +1,15 @@
 package com.sam.coin.dao;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.sam.coin.model.CoinsEntries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,29 +30,18 @@ public class CoinDataAccessService implements CoinDao {
     private static String SELECT_COIN_BY_TABLE_AND_ID = "SELECT * FROM {table_name} WHERE {table_name}.id = '{id}'";
     private static String SELECT_COIN_BY_TABLE_AND_DATE = "SELECT * FROM {table_name} WHERE DATE({table_name}.time_stamp) = '{date}'";
 
-    private static String SELECT_ALL_DUPLICATES_WITH_SAME_DATE =
-            "SELECT * FROM {table_name} " +
-                    "WHERE DATE(time_stamp) IN (" +
-                    "   SELECT DATE(time_stamp)" +
-                    "   FROM {table_name}" +
-                    "   GROUP BY DATE(time_stamp)" +
-                    "   HAVING COUNT(*) > 1)" +
-                    " ORDER BY time_stamp DESC;";
+    private static String SELECT_ALL_DUPLICATES_WITH_SAME_DATE = "SELECT * FROM {table_name} " + "WHERE DATE(time_stamp) IN (" + "   SELECT DATE(time_stamp)" + "   FROM {table_name}" + "   GROUP BY DATE(time_stamp)" + "   HAVING COUNT(*) > 1)" + " ORDER BY time_stamp DESC;";
 
     // Danger, this deletes all duplicates from db
-    private static String DELETE_ALL_DUPLICATES_WITH_SAME_DATE =
-            "DELETE FROM {table_name} " +
-                    "WHERE ctid NOT IN (" +
-                    "  SELECT DISTINCT ON (DATE(time_stamp)) ctid" +
-                    "  FROM {table_name}" +
-                    "  ORDER BY DATE(time_stamp), ctid" +
-                    ")";
+    private static String DELETE_ALL_DUPLICATES_WITH_SAME_DATE = "DELETE FROM {table_name} " + "WHERE ctid NOT IN (" + "  SELECT DISTINCT ON (DATE(time_stamp)) ctid" + "  FROM {table_name}" + "  ORDER BY DATE(time_stamp), ctid" + ")";
 
 
     //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp) VALUES (?, ?, ?)";
 //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp, datetime, high, low, bid, ask, vwap, close, last, basevolume, quotevolume, isymbol, ipricechange, ipricechangeprcnt, iweightedavgprice, iprevcloseprice, ilastprice, ilastqty, ibidprice, iaskprice, iaskqty, iopenprice, ihighprice, ilowprice, ivolume, iquotevolume, iopentime, iclosetime, ifirstid, ilastid, icount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String INSERT_COIN = "INSERT INTO %s (id, time_stamp, symbol, coin_id, coin_name, price_eur, price_usd, price_btc, price_eth, market_cap_eur, market_cap_usd, market_cap_btc, market_cap_eth, total_volume_eur, total_volume_usd, total_volume_btc, total_volume_eth, twitter_followers, reddit_avg_posts_48_hours, reddit_avg_comments_48_hours, reddit_accounts_active_48_hours, reddit_subscribers, dev_forks, dev_stars, dev_total_issues, dev_closed_issues, dev_pull_requests_merged, dev_pull_request_contributors, dev_commit_count_4_weeks, dev_code_additions_4_weeks, dev_code_deletions_4_weeks, public_alexa_rank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp, datetime, high, low, bid, ask, vwap, close, last, basevolume, quotevolume) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    Set<String> tableNames = Set.of("ampleforth", "zilliqa", "vechain", "bitcoin_diamond", "litecoin", "compound_ether", "compound_coin", "waves", "uma", "bzx_protocol", "band_protocol", "ocean_protocol", "theta_token", "singularitynet", "thorchain", "kava", "ethereum", "algorand", "cardano", "chainlink", "polkadot", "stellar", "zcash", "coins");
 
     /*
      * In order to Autowire the correct implementation the following dependency
@@ -75,25 +63,12 @@ public class CoinDataAccessService implements CoinDao {
     public boolean insertCoin(UUID id, Coin coin) {
         // TODO Auto-generated method stub
         int update = -1;
-        update = jdbcTemplate.update(
-                INSERT_COIN.replace("%s",
-                        coin.getCoinId().contentEquals("bitcoin") ? "coins" : coin.getCoinId().replace("-", "_")),
-                id, coin.getTimestamp(), coin.getSymbol(), coin.getCoinId(), coin.getCoinName(), coin.getPriceEur(),
-                coin.getPriceUsd(), coin.getPriceBtc(), coin.getPriceEth(), coin.getMarketCapEur(),
-                coin.getMarketCapUsd(), coin.getMarketCapBtc(), coin.getMarketCapEth(), coin.getTotalVolumeEur(),
-                coin.getTotalVolumeUsd(), coin.getTotalVolumeBtc(), coin.getTotalVolumeEth(),
-                coin.getTwitterFollowers(), coin.getRedditAvgPosts48Hours(), coin.getRedditAvgComments48Hours(),
-                coin.getRedditAccountsActive48Hours(), coin.getRedditSubscribers(), coin.getDevForks(),
-                coin.getDevStars(), coin.getDevTotalIssues(), coin.getDevClosedIssues(),
-                coin.getDevPullRequestsMerged(), coin.getDevPullRequestContributors(), coin.getDevCommitCount4Weeks(),
-                coin.getDevCodeAdditions4Weeks(), coin.getDevCodeDeletions4Weeks(), coin.getPublicAlexaRank());
+        update = jdbcTemplate.update(INSERT_COIN.replace("%s", coin.getCoinId().contentEquals("bitcoin") ? "coins" : coin.getCoinId().replace("-", "_")), id, coin.getTimestamp(), coin.getSymbol(), coin.getCoinId(), coin.getCoinName(), coin.getPriceEur(), coin.getPriceUsd(), coin.getPriceBtc(), coin.getPriceEth(), coin.getMarketCapEur(), coin.getMarketCapUsd(), coin.getMarketCapBtc(), coin.getMarketCapEth(), coin.getTotalVolumeEur(), coin.getTotalVolumeUsd(), coin.getTotalVolumeBtc(), coin.getTotalVolumeEth(), coin.getTwitterFollowers(), coin.getRedditAvgPosts48Hours(), coin.getRedditAvgComments48Hours(), coin.getRedditAccountsActive48Hours(), coin.getRedditSubscribers(), coin.getDevForks(), coin.getDevStars(), coin.getDevTotalIssues(), coin.getDevClosedIssues(), coin.getDevPullRequestsMerged(), coin.getDevPullRequestContributors(), coin.getDevCommitCount4Weeks(), coin.getDevCodeAdditions4Weeks(), coin.getDevCodeDeletions4Weeks(), coin.getPublicAlexaRank());
         if (update < 0) {
             LOG.error("Failed to insert Coin: {} with ID: {}", id, coin.getSymbol(), coin.getTimestamp());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Failed to insert Coin: " + coin.getSymbol() + " with ID:" + id);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to insert Coin: " + coin.getSymbol() + " with ID:" + id);
         }
-        LOG.info("Successfully inserted #of Rows: " + update + ". Added Coin: " + coin.getSymbol() + " with ID: " + id
-                + " and timestamp: " + coin.getTimestamp());
+        LOG.info("Successfully inserted #of Rows: " + update + ". Added Coin: " + coin.getSymbol() + " with ID: " + id + " and timestamp: " + coin.getTimestamp());
         return true;
     }
 
@@ -147,6 +122,13 @@ public class CoinDataAccessService implements CoinDao {
     @Override
     public Optional<Coin> selectCoinById(UUID id) {
         return Optional.empty();
+    }
+
+    @Override
+    public Map<String, Integer> countAllEntries() {
+        List<CoinsEntries> coinsEntries = this.queryCoinsCount(this.getCountQueryForAllToken(tableNames));
+        Map<String, Integer> sortedCoinEntries = sortHashMapByValuesDescending(coinEntriesToHashMap(coinsEntries.get(0)));
+        return sortedCoinEntries;
     }
 
     @Override
@@ -230,6 +212,38 @@ public class CoinDataAccessService implements CoinDao {
         return queryResult;
     }
 
+    private List<CoinsEntries> queryCoinsCount(String query) {
+        List<CoinsEntries> queryResult = jdbcTemplate.query(query, (result, i) -> {
+            CoinsEntries coinsEntries = new CoinsEntries();
+            coinsEntries.setAmpleforthCount(result.getInt("ampleforth_count"));
+            coinsEntries.setZilliqaCount(result.getInt("zilliqa_count"));
+            coinsEntries.setVechainCount(result.getInt("vechain_count"));
+            coinsEntries.setBitcoinDiamondCount(result.getInt("bitcoin_diamond_count"));
+            coinsEntries.setLitecoinCount(result.getInt("litecoin_count"));
+            coinsEntries.setCompoundEtherCount(result.getInt("compound_ether_count"));
+            coinsEntries.setCompoundCoinCount(result.getInt("compound_coin_count"));
+            coinsEntries.setWavesCount(result.getInt("waves_count"));
+            coinsEntries.setUmaCount(result.getInt("uma_count"));
+            coinsEntries.setBzxProtocolCount(result.getInt("bzx_protocol_count"));
+            coinsEntries.setBandProtocolCount(result.getInt("band_protocol_count"));
+            coinsEntries.setOceanProtocolCount(result.getInt("ocean_protocol_count"));
+            coinsEntries.setThetaTokenCount(result.getInt("theta_token_count"));
+            coinsEntries.setSingularitynetCount(result.getInt("singularitynet_count"));
+            coinsEntries.setThorchainCount(result.getInt("thorchain_count"));
+            coinsEntries.setKavaCount(result.getInt("kava_count"));
+            coinsEntries.setEthereumCount(result.getInt("ethereum_count"));
+            coinsEntries.setAlgorandCount(result.getInt("algorand_count"));
+            coinsEntries.setCardanoCount(result.getInt("cardano_count"));
+            coinsEntries.setChainlinkCount(result.getInt("chainlink_count"));
+            coinsEntries.setPolkadotCount(result.getInt("polkadot_count"));
+            coinsEntries.setStellarCount(result.getInt("stellar_count"));
+            coinsEntries.setZcashCount(result.getInt("zcash_count"));
+            coinsEntries.setBitcoinCount(result.getInt("bitcoin_count"));
+            return coinsEntries;
+        });
+        return queryResult;
+    }
+
     private static Timestamp getTimestampFromQueryResult(ResultSet result) throws SQLException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
         Date parsedDate = null;
@@ -253,6 +267,54 @@ public class CoinDataAccessService implements CoinDao {
     public boolean updateCoinByID(UUID id, Coin coin) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    private String getCountQueryForAllToken(Set<String> tableNames) {
+        return "SELECT * from " + tableNames.stream().map(this::replaceTableNameInQuery).collect(Collectors.joining(", "));
+    }
+
+    private String replaceTableNameInQuery(String tableName) {
+        String replacedQuery = "(SELECT COUNT(*) as {table_name_short}_count from {table_name}) as {table_name_short}".replace("{table_name}", tableName).replace("{table_name_short}", tableName.equals("coins") ? "bitcoin" : tableName);
+        LOG.info(replacedQuery);
+        return replacedQuery;
+    }
+
+    // (tableName.substring(0, tableName.contains("_") && isNoTableException(tableName) ? tableName.indexOf("_") : tableName.length()))
+
+    private boolean isNoTableException(String tableName) {
+        return !(tableName.equals("compound_coin") || tableName.equals("compound_ether") || tableName.equals("bitcoin_diamond"));
+    }
+
+    private Map<String, Integer> coinEntriesToHashMap(CoinsEntries coinEntries) {
+        Map<String, Integer> resultMap = new HashMap<>();
+        // Iterate over the fields of the CoinEntries class
+        for (Field field : coinEntries.getClass().getDeclaredFields()) {
+            try {
+                // Make the field accessible
+                field.setAccessible(true);
+                // Get the field's value and name
+                Integer fieldValue = (Integer) field.get(coinEntries);
+                String fieldName = field.getName();
+                // Add the field name and value to the resultMap
+                resultMap.put(fieldName, fieldValue);
+            } catch (IllegalAccessException e) {
+                // Handle any exceptions that might occur
+                e.printStackTrace();
+            }
+        }
+        return resultMap;
+    }
+
+    private Map<String, Integer> sortHashMapByValuesDescending(Map<String, Integer> unsortedMap) {
+        return unsortedMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
     }
 
 }

@@ -1,8 +1,6 @@
 package com.sam.coin.dao;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import com.sam.coin.model.Coin;
 
@@ -18,6 +16,8 @@ public interface CoinDao {
     List<Coin> selectAllCoins();
 
     Optional<Coin> selectCoinById(UUID id);
+
+    Map<String, Integer> countAllEntries();
 
     Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id);
 
