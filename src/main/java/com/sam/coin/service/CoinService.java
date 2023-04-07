@@ -2,6 +2,9 @@ package com.sam.coin.service;
 
 import java.util.*;
 
+import com.sam.coin.dao.CoinDataAccessService;
+import com.sam.coin.dao.CoinDataAccessService.OrderBy;
+import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +39,8 @@ public class CoinService {
 		return coinDao.deleteCoinByID(id);
 	}
 
-	public Map<String, Integer> countAllEntries(){
-		return coinDao.countAllEntries();
+	public Map<String, TableInfo>  countAllEntries(OrderBy orderBy){
+		return coinDao.countAllEntries(orderBy);
 	}
 
 	public Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id) {

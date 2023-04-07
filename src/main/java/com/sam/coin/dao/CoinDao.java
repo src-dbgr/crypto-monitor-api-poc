@@ -3,6 +3,8 @@ package com.sam.coin.dao;
 import java.util.*;
 
 import com.sam.coin.model.Coin;
+import com.sam.coin.dao.CoinDataAccessService.OrderBy;
+import com.sam.coin.model.TableInfo;
 
 public interface CoinDao {
 
@@ -17,7 +19,7 @@ public interface CoinDao {
 
     Optional<Coin> selectCoinById(UUID id);
 
-    Map<String, Integer> countAllEntries();
+    Map<String, TableInfo>  countAllEntries(OrderBy orderBy);
 
     Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id);
 

@@ -1,5 +1,18 @@
 package com.sam.coin.dao;
 
+import com.sam.coin.api.CoinController;
+import com.sam.coin.model.Coin;
+import com.sam.coin.model.CoinsEntries;
+import com.sam.coin.model.TableInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,24 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.sam.coin.model.CoinsEntries;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
-
-import com.sam.coin.api.CoinController;
-import com.sam.coin.model.Coin;
-
 @Repository("postgrescoins")
 public class CoinDataAccessService implements CoinDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinController.class);
     private static final String SELECT_ALL_COINS = "SELECT * FROM coins";
     public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
     private static String SELECT_COIN_BY_TABLE_AND_ID = "SELECT * FROM {table_name} WHERE {table_name}.id = '{id}'";
     private static String SELECT_COIN_BY_TABLE_AND_DATE = "SELECT * FROM {table_name} WHERE DATE({table_name}.time_stamp) = '{date}'";
 
@@ -125,19 +127,22 @@ public class CoinDataAccessService implements CoinDao {
     }
 
     @Override
-    public Map<String, Integer> countAllEntries() {
+    public Map<String, TableInfo> countAllEntries(OrderBy orderBy) {
         List<CoinsEntries> coinsEntries = this.queryCoinsCount(this.getCountQueryForAllToken(tableNames));
         Map<String, Integer> sortedCoinEntries = sortHashMapByValuesDescending(coinEntriesToHashMap(coinsEntries.get(0)));
-        return sortedCoinEntries;
+
+        Map<String, TableInfo> tableInfo = getTableInfo(this.getCountQueryForAllToken(tableNames), orderBy);
+        LOG.info(tableInfo.toString());
+
+        return tableInfo;
+//        return sortedCoinEntries;
     }
 
     @Override
     public Optional<Coin> selectCoinByTableNameAndId(String tableName, UUID id) {
         String SELECT_COIN_BY_TABLE_AND_ID_QUERY = SELECT_COIN_BY_TABLE_AND_ID;
         SELECT_COIN_BY_TABLE_AND_ID_QUERY = SELECT_COIN_BY_TABLE_AND_ID_QUERY.replace("{table_name}", tableName);
-        System.out.println("SELECT_COIN_BY_ID 1st Replace :" + SELECT_COIN_BY_TABLE_AND_ID_QUERY);
         SELECT_COIN_BY_TABLE_AND_ID_QUERY = SELECT_COIN_BY_TABLE_AND_ID_QUERY.replace("{id}", id.toString());
-        System.out.println("SELECT_COIN_BY_ID 2st Replace :" + SELECT_COIN_BY_TABLE_AND_ID_QUERY);
         List<Coin> queryResult = queryCoin(SELECT_COIN_BY_TABLE_AND_ID_QUERY);
         return Optional.of(queryResult.get(0));
     }
@@ -146,9 +151,7 @@ public class CoinDataAccessService implements CoinDao {
     public List<Coin> selectCoinByTableNameAndDate(String tableName, String date) {
         String SELECT_COIN_BY_TABLE_AND_DATE_QUERY = SELECT_COIN_BY_TABLE_AND_DATE;
         SELECT_COIN_BY_TABLE_AND_DATE_QUERY = SELECT_COIN_BY_TABLE_AND_DATE_QUERY.replace("{table_name}", tableName);
-        System.out.println("SELECT_COIN_BY_ID 1st Replace :" + SELECT_COIN_BY_TABLE_AND_DATE_QUERY);
         SELECT_COIN_BY_TABLE_AND_DATE_QUERY = SELECT_COIN_BY_TABLE_AND_DATE_QUERY.replace("{date}", date);
-        System.out.println("SELECT_COIN_BY_ID 2st Replace :" + SELECT_COIN_BY_TABLE_AND_DATE_QUERY);
         return queryCoin(SELECT_COIN_BY_TABLE_AND_DATE_QUERY);
     }
 
@@ -156,7 +159,6 @@ public class CoinDataAccessService implements CoinDao {
     public int deleteDuplicatesWithSameDate(String tableName) {
         String DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = DELETE_ALL_DUPLICATES_WITH_SAME_DATE;
         DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY.replace("{table_name}", tableName);
-        System.out.println("SELECT_COIN_BY_ID 1st Replace :" + DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
         int updatedRows = jdbcTemplate.update(DELETE_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
         LOG.info("Updated {} rows.", updatedRows);
         return updatedRows;
@@ -166,7 +168,6 @@ public class CoinDataAccessService implements CoinDao {
     public List<Coin> getAllDuplicatesWithSameDate(String tableName) {
         String SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = SELECT_ALL_DUPLICATES_WITH_SAME_DATE;
         SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY = SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY.replace("{table_name}", tableName);
-        System.out.println("SELECT_COIN_BY_ID 1st Replace :" + SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
         List<Coin> duplicateCoins = queryCoin(SELECT_ALL_DUPLICATES_WITH_SAME_DATE_QUERY);
         LOG.info("Contains {} Entries with same date.", duplicateCoins.size());
         return duplicateCoins;
@@ -245,11 +246,10 @@ public class CoinDataAccessService implements CoinDao {
     }
 
     private static Timestamp getTimestampFromQueryResult(ResultSet result) throws SQLException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
         Date parsedDate = null;
         try {
             String time_stamp = result.getString("time_stamp");
-            parsedDate = dateFormat.parse(time_stamp);
+            parsedDate = DATE_FORMAT.parse(time_stamp);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -270,12 +270,12 @@ public class CoinDataAccessService implements CoinDao {
     }
 
     private String getCountQueryForAllToken(Set<String> tableNames) {
-        return "SELECT * from " + tableNames.stream().map(this::replaceTableNameInQuery).collect(Collectors.joining(", "));
+        String allCountQuery = "SELECT * from " + tableNames.stream().map(this::replaceTableNameInQuery).collect(Collectors.joining(", "));
+        return allCountQuery;
     }
 
     private String replaceTableNameInQuery(String tableName) {
-        String replacedQuery = "(SELECT COUNT(*) as {table_name_short}_count from {table_name}) as {table_name_short}".replace("{table_name}", tableName).replace("{table_name_short}", tableName.equals("coins") ? "bitcoin" : tableName);
-        LOG.info(replacedQuery);
+        String replacedQuery = "(SELECT COUNT(*) as {table_name_short}_count, MAX(time_stamp) as {table_name_short}_most_recent from {table_name}) as {table_name_short}".replace("{table_name}", tableName).replace("{table_name_short}", tableName.equals("coins") ? "bitcoin" : tableName);
         return replacedQuery;
     }
 
@@ -315,6 +315,63 @@ public class CoinDataAccessService implements CoinDao {
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
+    }
+
+    public enum OrderBy {
+        COUNT, DATE, ALPHABETICAL
+    }
+
+    public Map<String, TableInfo> getTableInfo(String sqlQuery, OrderBy orderBy) {
+        // Execute the query
+        Map<String, Object> resultSet = jdbcTemplate.queryForMap(sqlQuery);
+
+        // Convert the result set to a map of TableInfo objects
+//        Map<String, TableInfo> tableInfoMap = new HashMap<>();
+        Map<String, TableInfo> tableInfoMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : resultSet.entrySet()) {
+            String key = entry.getKey();
+            if (key.endsWith("_count")) {
+                String tableName = key.substring(0, key.length() - 6);
+                int count = ((Long) entry.getValue()).intValue();
+                Timestamp mostRecent = (Timestamp) resultSet.get(tableName + "_most_recent");
+                tableInfoMap.put(tableName, new TableInfo(count, mostRecent));
+            }
+        }
+
+        Comparator<String> comparator = getComparator(orderBy, tableInfoMap);
+
+        SortedMap<String, TableInfo> sortedTableInfoMap = new TreeMap<>(comparator);
+        sortedTableInfoMap.putAll(tableInfoMap);
+
+        return sortedTableInfoMap;
+    }
+
+    private static Comparator<String> getComparator(OrderBy orderBy, Map<String, TableInfo> tableInfoMap) {
+        // Custom comparator for ordering
+        Comparator<String> comparator = (key1, key2) -> {
+            if (orderBy == OrderBy.ALPHABETICAL) {
+                return key1.compareTo(key2);
+            } else {
+                TableInfo info1 = tableInfoMap.get(key1);
+                TableInfo info2 = tableInfoMap.get(key2);
+
+                if (orderBy == OrderBy.COUNT) {
+                    return Integer.compare(info2.getCount(), info1.getCount());
+                } else {
+                    return info2.getMostRecent().compareTo(info1.getMostRecent());
+                }
+            }
+        };
+        return comparator;
+    }
+
+    class TableInfoRowMapper implements RowMapper<TableInfo> {
+        @Override
+        public TableInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            int count = rs.getInt(1);
+            Timestamp mostRecent = rs.getTimestamp(2);
+            return new TableInfo(count, mostRecent);
+        }
     }
 
 }

@@ -4,18 +4,13 @@ import java.util.*;
 
 import javax.validation.Valid;
 
+import com.sam.coin.dao.CoinDataAccessService.OrderBy;
+import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sam.coin.model.Coin;
 import com.sam.coin.service.CoinService;
@@ -50,8 +45,13 @@ public class CoinController {
     }
 
     @GetMapping(path = "count")
-    public Map<String, Integer> countAllEntries() {
-        return coinService.countAllEntries();
+    public Map<String, TableInfo> countAllEntries(@RequestParam(defaultValue = "alphabetical") String orderBy) {
+        if(orderBy.equals("numeric")){
+            return coinService.countAllEntries(OrderBy.COUNT);
+        }else if (orderBy.equals("date")){
+            return coinService.countAllEntries(OrderBy.DATE);
+        }
+        return coinService.countAllEntries(OrderBy.ALPHABETICAL);
     }
 
     @GetMapping(path = "{table}/id/{id}")
@@ -64,16 +64,12 @@ public class CoinController {
     @GetMapping(path = "{table}/date/{date}")
     public List<Coin> selectCoinByTableNameAndDate(@PathVariable("table") String tableName, @PathVariable("date") String date) {
         List<Coin> coins = coinService.selectCoinByTableNameAndDate(tableName, date);
-        System.out.println("\n\n");
-        System.out.println(coins.toString());
         return coins;
     }
 
     @GetMapping(path = "{table}/duplicates")
     public Map<Integer, List<Coin>> getAllDuplicatesWithSameDate(@PathVariable("table") String tableName) {
         List<Coin> coins = coinService.getAllDuplicatesWithSameDate(tableName);
-        System.out.println("\n\n");
-        System.out.println(coins.toString());
         HashMap<Integer, List<Coin>> result = new HashMap<>();
         result.put(coins.size(), coins);
         return result;
