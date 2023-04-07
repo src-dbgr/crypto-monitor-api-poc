@@ -3,7 +3,7 @@ package com.sam.coin.dao;
 import java.util.*;
 
 import com.sam.coin.model.Coin;
-import com.sam.coin.dao.CoinDataAccessService.OrderBy;
+import com.sam.coin.service.CoinDataAccessService.OrderBy;
 import com.sam.coin.model.TableInfo;
 
 public interface CoinDao {
@@ -15,7 +15,7 @@ public interface CoinDao {
         return insertCoin(id, coin);
     }
 
-    List<Coin> selectAllCoins();
+    List<Coin> selectAllCoins(String tableName);
 
     Optional<Coin> selectCoinById(UUID id);
 
@@ -32,5 +32,6 @@ public interface CoinDao {
     boolean deleteCoinByID(UUID id);
 
     boolean updateCoinByID(UUID id, Coin coin);
+    String exportTableToCsv(String tableName);
 
 }

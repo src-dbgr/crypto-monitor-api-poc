@@ -2,8 +2,7 @@ package com.sam.coin.service;
 
 import java.util.*;
 
-import com.sam.coin.dao.CoinDataAccessService;
-import com.sam.coin.dao.CoinDataAccessService.OrderBy;
+import com.sam.coin.service.CoinDataAccessService.OrderBy;
 import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,9 @@ public class CoinService {
 		return coinDao.insertCoin(coin);
 	}
 
-	public List<Coin> getAllCoins() {
+	public List<Coin> getAllCoins(String tableName) {
 		LOG.info("Getting all coins from Database");
-		return coinDao.selectAllCoins();
+		return coinDao.selectAllCoins(tableName);
 	}
 
 	public boolean deleteCoinByID(UUID id) {
@@ -70,5 +69,9 @@ public class CoinService {
 	public boolean updateCoin(UUID id, Coin newCoin) {
 		LOG.info("Updating Coin with ID: " + id);
 		return coinDao.updateCoinByID(id, newCoin);
+	}
+
+	public String exportTableToCsv(String tableName) {
+		return coinDao.exportTableToCsv(tableName);
 	}
 }

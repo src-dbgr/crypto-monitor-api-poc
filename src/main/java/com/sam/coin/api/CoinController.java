@@ -1,14 +1,20 @@
 package com.sam.coin.api;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import com.sam.coin.dao.CoinDataAccessService.OrderBy;
+import com.sam.coin.service.CoinDataAccessService.OrderBy;
 import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +38,8 @@ public class CoinController {
         LOG.info("Added new coin: " + coin.getSymbol());
     }
 
-    @GetMapping
-    public List<Coin> getAllCoins() {
+    @GetMapping(path = "{table}/all")
+    public List<Coin> getAllCoins(String tableName) {
         //TODO
         return null;
 //		return coinService.getAllCoins();
@@ -84,6 +90,27 @@ public class CoinController {
     public void updateCoin(@PathVariable("id") UUID id, @Valid @NonNull @RequestBody Coin coinToUpdate) {
         LOG.debug("PUT ID: " + id);
         coinService.updateCoin(id, coinToUpdate);
+    }
+
+    @GetMapping(value = "{tableName}/export", produces = "text/csv")
+    public ResponseEntity<String> exportTableToCsv(@PathVariable("tableName") String tableName, HttpServletResponse response) throws IOException {
+        String csvData = coinService.exportTableToCsv(tableName);
+        // Set up the response headers for CSV file download
+        String fileName = tableName + "_export.csv";
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        // Write the CSV data to the response body
+        try (PrintWriter writer = response.getWriter()) {
+            writer.write(csvData);
+        }
+
+        // Return an empty response
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping(value = "{tableName}/exporttext", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String exportTableToCsv(@PathVariable("tableName") String tableName) throws IOException {
+        return coinService.exportTableToCsv(tableName);
     }
 
 }

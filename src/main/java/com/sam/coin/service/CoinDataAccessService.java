@@ -1,20 +1,28 @@
-package com.sam.coin.dao;
+package com.sam.coin.service;
 
 import com.sam.coin.api.CoinController;
+import com.sam.coin.dao.CoinDao;
 import com.sam.coin.model.Coin;
 import com.sam.coin.model.CoinsEntries;
 import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -26,7 +34,7 @@ import java.util.stream.Collectors;
 public class CoinDataAccessService implements CoinDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinController.class);
-    private static final String SELECT_ALL_COINS = "SELECT * FROM coins";
+    private static final String SELECT_ALL_COINS_FROM_TABLE = "SELECT * FROM {table_name} ORDER BY time_stamp DESC";
     public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
     private static String SELECT_COIN_BY_TABLE_AND_ID = "SELECT * FROM {table_name} WHERE {table_name}.id = '{id}'";
@@ -75,10 +83,11 @@ public class CoinDataAccessService implements CoinDao {
     }
 
     @Override
-    public List<Coin> selectAllCoins() {
+    public List<Coin> selectAllCoins(String tableName) {
         List<Coin> coins = null;
         // Lambda
-        coins = jdbcTemplate.query(SELECT_ALL_COINS, (resultSet, i) -> {
+        String SELECT_ALL_COINS_FROM_TABLE_QUERY = SELECT_ALL_COINS_FROM_TABLE.replace("{table_name}", tableName);
+        coins = jdbcTemplate.query(SELECT_ALL_COINS_FROM_TABLE_QUERY, (resultSet, i) -> {
             UUID id = UUID.fromString(resultSet.getString("id"));
             Coin coin = new Coin(id);
             coin.setSymbol(resultSet.getString(""));
@@ -267,6 +276,46 @@ public class CoinDataAccessService implements CoinDao {
     public boolean updateCoinByID(UUID id, Coin coin) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public String exportTableToCsv(String tableName) {
+        String SELECT_ALL_COINS_FROM_TABLE_QUERY = SELECT_ALL_COINS_FROM_TABLE.replace("{table_name}", tableName);
+        return fetchDataAndGenerateCsv(SELECT_ALL_COINS_FROM_TABLE_QUERY);
+    }
+
+
+    private String fetchDataAndGenerateCsv(String query) {
+        return jdbcTemplate.query(query, new ResultSetExtractor<String>() {
+            @Override
+            public String extractData(ResultSet rs) throws SQLException {
+                StringBuilder sb = new StringBuilder();
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                // Write the header line
+                for (int i = 1; i <= columnCount; i++) {
+                    sb.append(metaData.getColumnName(i) == null ? "" : metaData.getColumnName(i));
+                    if (i < columnCount) {
+                        sb.append(",");
+                    }
+                }
+                sb.append("\n");
+
+                // Write the data lines
+                while (rs.next()) {
+                    for (int i = 1; i <= columnCount; i++) {
+                        sb.append(rs.getString(i) == null ? "" : rs.getString(i));
+                        if (i < columnCount) {
+                            sb.append(",");
+                        }
+                    }
+                    sb.append("\n");
+                }
+
+                return sb.toString();
+            }
+        });
     }
 
     private String getCountQueryForAllToken(Set<String> tableNames) {
