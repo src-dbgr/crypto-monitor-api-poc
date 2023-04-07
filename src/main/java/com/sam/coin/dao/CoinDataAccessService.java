@@ -1,5 +1,12 @@
 package com.sam.coin.dao;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,8 +27,29 @@ public class CoinDataAccessService implements CoinDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinController.class);
     private static final String SELECT_ALL_COINS = "SELECT * FROM coins";
+    public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static String SELECT_COIN_BY_TABLE_AND_ID = "SELECT * FROM {table_name} WHERE {table_name}.id = '{id}'";
-    private static String SELECT_COIN_BY_TABLE_AND_DATE = "SELECT * FROM {table_name} WHERE {table_name}.time_stamp = '{date}'";
+    private static String SELECT_COIN_BY_TABLE_AND_DATE = "SELECT * FROM {table_name} WHERE DATE({table_name}.time_stamp) = '{date}'";
+
+    private static String SELECT_ALL_DUPLICATES_WITH_SAME_DATE =
+            "SELECT * FROM {table_name} " +
+            "WHERE DATE(time_stamp) IN (" +
+            "   SELECT DATE(time_stamp)" +
+            "   FROM {table_name}" +
+            "   GROUP BY DATE(time_stamp)" +
+            "   HAVING COUNT(*) > 1)" +
+            " ORDER BY time_stamp";
+
+    // Danger, this deletes all duplicates from db
+    private static String DELETE_ALL_DUPLICATES_WITH_SAME_DATE =
+            "DELETE FROM {table_name}" +
+            "WHERE ctid NOT IN (" +
+            "  SELECT DISTINCT ON (DATE(time_stamp)) ctid" +
+            "  FROM {table_name}" +
+            "  ORDER BY DATE(time_stamp), ctid" +
+            ")";
+
+
     //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp) VALUES (?, ?, ?)";
 //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp, datetime, high, low, bid, ask, vwap, close, last, basevolume, quotevolume, isymbol, ipricechange, ipricechangeprcnt, iweightedavgprice, iprevcloseprice, ilastprice, ilastqty, ibidprice, iaskprice, iaskqty, iopenprice, ihighprice, ilowprice, ivolume, iquotevolume, iopentime, iclosetime, ifirstid, ilastid, icount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String INSERT_COIN = "INSERT INTO %s (id, time_stamp, symbol, coin_id, coin_name, price_eur, price_usd, price_btc, price_eth, market_cap_eur, market_cap_usd, market_cap_btc, market_cap_eth, total_volume_eur, total_volume_usd, total_volume_btc, total_volume_eth, twitter_followers, reddit_avg_posts_48_hours, reddit_avg_comments_48_hours, reddit_accounts_active_48_hours, reddit_subscribers, dev_forks, dev_stars, dev_total_issues, dev_closed_issues, dev_pull_requests_merged, dev_pull_request_contributors, dev_commit_count_4_weeks, dev_code_additions_4_weeks, dev_code_deletions_4_weeks, public_alexa_rank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -59,41 +87,6 @@ public class CoinDataAccessService implements CoinDao {
                 coin.getDevStars(), coin.getDevTotalIssues(), coin.getDevClosedIssues(),
                 coin.getDevPullRequestsMerged(), coin.getDevPullRequestContributors(), coin.getDevCommitCount4Weeks(),
                 coin.getDevCodeAdditions4Weeks(), coin.getDevCodeDeletions4Weeks(), coin.getPublicAlexaRank());
-//		update = jdbcTemplate.update(INSERT_COIN, 
-//				id,
-//				coin.getSymbol(),
-//				coin.getTimestamp(),
-//				coin.getDatetime(),
-//				coin.getHigh(),
-//				coin.getLow(),
-//				coin.getBid(),
-//				coin.getAsk(),
-//				coin.getVwap(),
-//				coin.getClose(),
-//				coin.getLast(),
-//				coin.getBaseVolume(),
-//				coin.getQuoteVolume(),
-//				coin.getSymbol(),
-//				coin.getInfo().getPriceChange(),
-//				coin.getInfo().getPriceChangePercent(),
-//				coin.getInfo().getWeightedAvgPrice(),
-//				coin.getInfo().getPrevClosePrice(),
-//				coin.getInfo().getLastPrice(),
-//				coin.getInfo().getLastQty(),
-//				coin.getInfo().getBidPrice(),
-//				coin.getInfo().getAskPrice(),
-//				coin.getInfo().getAskQty(),
-//				coin.getInfo().getOpenPrice(),
-//				coin.getInfo().getHighPrice(),
-//				coin.getInfo().getLowPrice(),
-//				coin.getInfo().getVolume(),
-//				coin.getInfo().getQuoteVolume(),
-//				coin.getInfo().getOpenTime(),
-//				coin.getInfo().getCloseTime(),
-//				coin.getInfo().getFirstID(),
-//				coin.getInfo().getLastID(),
-//				coin.getInfo().getCount()
-//				);
         if (update < 0) {
             LOG.error("Failed to insert Coin: {} with ID: {}", id, coin.getSymbol(), coin.getTimestamp());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
@@ -144,46 +137,6 @@ public class CoinDataAccessService implements CoinDao {
             coin.setPublicAlexaRank(resultSet.getLong(""));
             return coin;
         });
-//		coins = jdbcTemplate.query(SELECT_ALL_COINS, (resultSet, i) -> {
-//			UUID id = UUID.fromString(resultSet.getString("id"));
-//			Coin coin = new Coin(id);
-//			Info info = coin.new Info();
-//			coin.setSymbol(resultSet.getString("symbol"));
-//			coin.setTimestamp(resultSet.getLong("timestmp"));
-//			coin.setDatetime(resultSet.getString("datetime"));
-//			coin.setHigh(resultSet.getBigDecimal("high"));
-//			coin.setLow(resultSet.getBigDecimal("low"));
-//			coin.setBid(resultSet.getBigDecimal("bid"));
-//			coin.setAsk(resultSet.getBigDecimal("ask"));
-//			coin.setVwap(resultSet.getBigDecimal("vwap"));
-//			coin.setClose(resultSet.getBigDecimal("close"));
-//			coin.setLast(resultSet.getBigDecimal("last"));
-//			coin.setBaseVolume(resultSet.getBigDecimal("basevolume"));
-//			coin.setQuoteVolume(resultSet.getBigDecimal("quotevolume"));
-//			info.setSymbol(resultSet.getString("isymbol"));
-//			info.setPriceChange(resultSet.getBigDecimal("ipricechange"));
-//			info.setPriceChangePercent(resultSet.getBigDecimal("ipricechangeprcnt"));
-//			info.setWeightedAvgPrice(resultSet.getBigDecimal("iweightedavgprice"));
-//			info.setPrevClosePrice(resultSet.getBigDecimal("iprevcloseprice"));
-//			info.setLastPrice(resultSet.getBigDecimal("ilastprice"));
-//			info.setLastQty(resultSet.getBigDecimal("ilastqty"));
-//			info.setBidPrice(resultSet.getBigDecimal("ibidprice"));
-//			info.setAskPrice(resultSet.getBigDecimal("iaskprice"));
-//			info.setAskQty(resultSet.getBigDecimal("iaskqty"));
-//			info.setOpenPrice(resultSet.getBigDecimal("iopenprice"));
-//			info.setHighPrice(resultSet.getBigDecimal("ihighprice"));
-//			info.setLowPrice(resultSet.getBigDecimal("ilowprice"));
-//			info.setVolume(resultSet.getBigDecimal("ivolume"));
-//			info.setQuoteVolume(resultSet.getBigDecimal("iquotevolume"));
-//			info.setOpenTime(resultSet.getLong("iopentime"));
-//			info.setCloseTime(resultSet.getLong("iclosetime"));
-//			info.setFirstID(resultSet.getLong("ifirstid"));
-//			info.setLastID(resultSet.getLong("ilastid"));
-//			info.setCount(resultSet.getLong("icount"));
-//			coin.setInfo(info);
-//			LOG.debug("Found Coin with Symbol: {} and timestamp: {}", coin.getSymbol(), coin.getTimestamp());
-//			return coin;
-//		});
         if (coins == null) {
             LOG.error("Could not retrieve Coins from Database - Result null");
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No Content in Database");
@@ -224,7 +177,7 @@ public class CoinDataAccessService implements CoinDao {
             coin.setSymbol(result.getString("symbol"));
             coin.setCoinId(result.getString("coin_id"));
             coin.setCoinName(result.getString("coin_name"));
-            coin.setTimestamp(result.getTimestamp("time_stamp"));
+            coin.setTimestamp(getTimestampFromQueryResult(result));
             coin.setPriceEur(result.getBigDecimal("price_eur"));
             coin.setPriceUsd(result.getBigDecimal("price_usd"));
             coin.setPriceBtc(result.getBigDecimal("price_btc"));
@@ -255,6 +208,19 @@ public class CoinDataAccessService implements CoinDao {
             return coin;
         });
         return queryResult;
+    }
+
+    private static Timestamp getTimestampFromQueryResult(ResultSet result) throws SQLException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+        Date parsedDate = null;
+        try {
+            String time_stamp = result.getString("time_stamp");
+            parsedDate = dateFormat.parse(time_stamp);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        Timestamp timestamp = new Timestamp(parsedDate.getTime());
+        return timestamp;
     }
 
     @Override
