@@ -404,11 +404,17 @@ public class CoinDataAccessService implements CoinDao {
                 TableInfo info1 = tableInfoMap.get(key1);
                 TableInfo info2 = tableInfoMap.get(key2);
 
+                int comparisonResult;
                 if (orderBy == OrderBy.COUNT) {
-                    return Integer.compare(info2.getCount(), info1.getCount());
+                    comparisonResult = Integer.compare(info2.getCount(), info1.getCount());
                 } else {
-                    return info2.getMostRecent().compareTo(info1.getMostRecent());
+                    comparisonResult = info2.getMostRecent().compareTo(info1.getMostRecent());
                 }
+                // If the comparator returns 0, the elements are considered equal, and the TreeMap implementation assumes that the keys are equal, so it only keeps one of the elements.
+                // When two TableInfo objects have the same date, the comparator returns 0.
+                // Make the comparator return a non-zero value for distinct keys even if the main sorting criteria (for instance date) are the same.
+                // If the comparison result is 0, fall back to comparing the keys alphabetically
+                return comparisonResult != 0 ? comparisonResult : key1.compareTo(key2);
             }
         };
         return comparator;

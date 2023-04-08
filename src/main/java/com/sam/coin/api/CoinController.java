@@ -52,12 +52,24 @@ public class CoinController {
 
     @GetMapping(path = "count")
     public Map<String, TableInfo> countAllEntries(@RequestParam(defaultValue = "alphabetical") String orderBy) {
-        if(orderBy.equals("numeric")){
+        if (orderBy.equals("numeric")) {
             return coinService.countAllEntries(OrderBy.COUNT);
-        }else if (orderBy.equals("date")){
+        } else if (orderBy.equals("date")) {
             return coinService.countAllEntries(OrderBy.DATE);
         }
         return coinService.countAllEntries(OrderBy.ALPHABETICAL);
+    }
+
+    @GetMapping(path = "{table}/count")
+    public Map<String, TableInfo> selectCoinByTableNameAndId(@PathVariable("table") String tableName) {
+        Map<String, TableInfo> result = new HashMap<String, TableInfo>();
+        try {
+            result.put(tableName, coinService.countAllEntries(OrderBy.ALPHABETICAL).get(tableName));
+            return result;
+        } catch (Exception e) {
+            LOG.error("Failed to find info for Table Name {}", tableName, e);
+        }
+        return result;
     }
 
     @GetMapping(path = "{table}/id/{id}")
@@ -108,6 +120,7 @@ public class CoinController {
         // Return an empty response
         return ResponseEntity.ok().build();
     }
+
     @GetMapping(value = "{tableName}/exporttext", produces = MediaType.TEXT_PLAIN_VALUE)
     public String exportTableToCsv(@PathVariable("tableName") String tableName) throws IOException {
         return coinService.exportTableToCsv(tableName);
