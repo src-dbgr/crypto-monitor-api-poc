@@ -1,0 +1,28 @@
+package com.sam.coin.model.util;
+
+public enum CompanyName {
+    ALGORAND,
+    AMPLEFORTH,
+    BAND_PROTOCOL,
+    BITCOIN,
+    BITCOIN_DIAMOND,
+    BZX_PROTOCOL,
+    CARDANO,
+    CHAINLINK,
+    COMPOUND_COIN,
+    COMPOUND_ETHER,
+    ETHEREUM,
+    KAVA,
+    LITECOIN,
+    OCEAN_PROTOCOL,
+    POLKADOT,
+    SINGULARITYNET,
+    STELLAR,
+    THETA_TOKEN,
+    THORCHAIN,
+    UMA,
+    VECHAIN,
+    WAVES,
+    ZCASH,
+    ZILLIQA
+}

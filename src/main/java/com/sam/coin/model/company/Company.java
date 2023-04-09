@@ -1,33 +1,54 @@
 package com.sam.coin.model.company;
 
+import com.mongodb.lang.Nullable;
 import com.sam.coin.model.CompanyMetadata;
-import com.sam.coin.model.util.Exchange;
-import com.sam.coin.model.util.Currency;
 import com.sam.coin.model.company.exchange.TradeExchange;
-import lombok.Value;
+import com.sam.coin.model.util.CompanyName;
+import com.sam.coin.model.util.Exchange;
+import lombok.*;
+import lombok.experimental.NonFinal;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.Null;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Document
-@Value
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class Company {
     @Id
-    private ObjectId id;
-    private String companyName;
-    private Map<Exchange,TradeExchange> tradeExchanges;
-    private List<CompanyMetadata> companyMetadata;
+    ObjectId id;
+    CompanyName companyName;
+    Map<Exchange, TradeExchange> tradeExchanges;
+    Set<CompanyMetadata> companyMetadata;
 
-    public Company(String companyName, Map<Exchange,TradeExchange> tradeExchanges) {
+    public Company(CompanyName companyName) {
+        this.id = ObjectId.get();
+        this.companyName = companyName;
+        this.tradeExchanges = new HashMap<>();
+        this.companyMetadata = new HashSet<>();
+    }
+
+    public Company(CompanyName companyName, Map<Exchange, TradeExchange> tradeExchanges) {
         this.id = ObjectId.get();
         this.companyName = companyName;
         this.tradeExchanges = tradeExchanges;
-        this.companyMetadata = new ArrayList<>();
+        this.companyMetadata = new HashSet<>();
     }
 
-    // Add getters and setters for all fields here
+    public Company(CompanyName companyName, Map<Exchange, TradeExchange> tradeExchanges, Set<CompanyMetadata> companyMetadata) {
+        this.id = ObjectId.get();
+        this.companyName = companyName;
+        this.tradeExchanges = tradeExchanges;
+        this.companyMetadata = companyMetadata;
+    }
+
 }
