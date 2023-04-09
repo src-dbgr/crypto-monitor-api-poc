@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import com.sam.coin.model.Coin;
 import com.sam.coin.service.CoinService;
 
-@RequestMapping("/api/v1/coin")
 @RestController
+@RequestMapping("/api/v1/coin")
 public class CoinController {
     private static final Logger LOG = LoggerFactory.getLogger(CoinController.class);
     private final CoinService coinService;
