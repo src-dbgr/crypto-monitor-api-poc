@@ -6,9 +6,11 @@ import com.sam.coin.model.util.CompanyName;
 import com.sam.coin.model.util.Currency;
 import com.sam.coin.model.util.Exchange;
 import com.sam.coin.service.CoinCandleService;
+import com.sam.coin.service.CsvService;
 import com.sam.coin.service.exceptions.DataValidationException;
 import com.sam.coin.service.exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +22,19 @@ import java.util.Set;
 @RequestMapping("/api/v1/coincandle")
 public class CoinCandleController {
     private final CoinCandleService coinCandleService;
+    private final CsvService csvService;
 
     @Autowired
-    public CoinCandleController(CoinCandleService coinCandleService) {
+    public CoinCandleController(CoinCandleService coinCandleService, CsvService csvService) {
         this.coinCandleService = coinCandleService;
+        this.csvService = csvService;
     }
 
-    @PostMapping
-    public Company create(@RequestBody Company company) {
-        return coinCandleService.save(company);
+    @PostMapping("/{companyName}")
+    public ResponseEntity<ApiResponse<Company>> create(@PathVariable CompanyName companyName) {
+        Company updatedCompany = coinCandleService.createNewCompany(companyName);
+        ApiResponse<Company> response = new ApiResponse<>(true, updatedCompany, "Candle saved successfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // Example /api/v1/coincandle/theta/candle?curreny=USD&exchange=BINANCE
@@ -61,6 +67,19 @@ public class CoinCandleController {
     public ResponseEntity<ApiResponse<Object>> handleDatabaseException(DatabaseException ex) {
         ApiResponse<Object> response = new ApiResponse<>(false, null, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("{companyName}/candle-csv")
+    public ResponseEntity<String> getCandleDataAsCSV(@PathVariable CompanyName companyName,
+                                                     @RequestParam Currency currency,
+                                                     @RequestParam Exchange exchange) {
+        Set<Candle> candles = coinCandleService.getCandleData(companyName, exchange, currency);
+        String csvData = csvService.convertCandleDataToCSV(candles);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/csv");
+        headers.add("Content-Disposition", "attachment; filename=candle-data.csv");
+        return new ResponseEntity<>(csvData, headers, HttpStatus.OK);
     }
 
 }

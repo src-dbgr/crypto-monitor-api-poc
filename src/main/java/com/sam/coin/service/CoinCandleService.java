@@ -34,10 +34,31 @@ public class CoinCandleService {
         return candleBasedRepository.findByCompanyName(companyName);
     }
 
+    public Company createNewCompany(CompanyName companyName) {
+        Optional<Company> companyOptional = candleBasedRepository.findByCompanyName(companyName);
+        Company company = companyOptional.orElseGet(() -> createNewCompanyWithCandleSet(companyName, null, null, null));
+        return candleBasedRepository.save(company);
+    }
+
+    public Set<Candle> getCandleData(CompanyName companyName, Exchange exchange, Currency currency) {
+        Optional<Company> companyOptional = candleBasedRepository.findByCompanyName(companyName);
+        if (companyOptional.isPresent()) {
+            Company company = companyOptional.get();
+            TradeExchange tradeExchange = company.getTradeExchanges().get(exchange);
+            if (tradeExchange != null) {
+                TradeCurrency tradeCurrencyObj = tradeExchange.getTradeCurrencies().get(currency);
+                if (tradeCurrencyObj != null) {
+                    return tradeCurrencyObj.getCandles();
+                }
+            }
+        }
+        return new HashSet<>();
+    }
+
     public Company addCandlesetData(CompanyName companyName, Currency currency, Exchange exchange, Set<Candle> candles) {
         try {
             if (!isValidCandleSet(candles)) {
-                throw new DataValidationException("Invalid candle data");
+                throw new DataValidationException("Invalid candle data.");
             }
             Optional<Company> companyOptional = candleBasedRepository.findByCompanyName(companyName);
             Company company = companyOptional.orElseGet(() -> createNewCompanyWithCandleSet(companyName, currency, exchange, candles));
@@ -95,22 +116,21 @@ public class CoinCandleService {
     }
 
     private boolean isValidCandle(Candle candle) {
-        return candle != null && candle.getCandleValues().size() == 5;
+        return candle != null && candle.getCandleValues().size() > 4 && candle.getCandleValues().size() < 7;
     }
-
 
     private static Company createNewCompanyWithCandle(CompanyName companyName, Currency currency, Exchange exchange, Candle candle) {
         return new Company(companyName, createNewTradeExchanges(currency, exchange, candle));
     }
 
     private static Map<Exchange, TradeExchange> createNewTradeExchanges(Currency currency, Exchange exchange, Candle candle) {
-        Map<Exchange, TradeExchange> tradeExchanges = new HashMap<>();
+        Map<Exchange, TradeExchange> tradeExchanges = new EnumMap<>(Exchange.class);
         tradeExchanges.put(exchange, new TradeExchange(exchange, createNewTradeCurrencies(currency, candle)));
         return tradeExchanges;
     }
 
     private static Map<Currency, TradeCurrency> createNewTradeCurrencies(Currency currency, Candle candle) {
-        Map<Currency, TradeCurrency> tradeCurrencies = new HashMap<>();
+        Map<Currency, TradeCurrency> tradeCurrencies = new EnumMap<>(Currency.class);
         tradeCurrencies.put(currency, new TradeCurrency(currency, createNewCandleSet(candle)));
         return tradeCurrencies;
     }
@@ -126,13 +146,13 @@ public class CoinCandleService {
     }
 
     private static Map<Exchange, TradeExchange> createNewTradeExchangesCandleSet(Currency currency, Exchange exchange, Set<Candle> candles) {
-        Map<Exchange, TradeExchange> tradeExchanges = new HashMap<>();
+        Map<Exchange, TradeExchange> tradeExchanges = new EnumMap<>(Exchange.class);
         tradeExchanges.put(exchange, new TradeExchange(exchange, createNewTradeCurrenciesCandleSet(currency, candles)));
         return tradeExchanges;
     }
 
     private static Map<Currency, TradeCurrency> createNewTradeCurrenciesCandleSet(Currency currency, Set<Candle> candles) {
-        Map<Currency, TradeCurrency> tradeCurrencies = new HashMap<>();
+        Map<Currency, TradeCurrency> tradeCurrencies = new EnumMap<>(Currency.class);
         tradeCurrencies.put(currency, new TradeCurrency(currency, candles));
         return tradeCurrencies;
     }
