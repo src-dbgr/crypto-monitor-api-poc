@@ -1,6 +1,6 @@
 package com.sam.coin.service;
 
-import com.sam.coin.api.ApiResponse;
+import com.sam.coin.exception.CompanyNotFoundException;
 import com.sam.coin.model.company.Company;
 import com.sam.coin.model.company.exchange.TradeExchange;
 import com.sam.coin.model.company.exchange.currency.TradeCurrency;
@@ -9,8 +9,8 @@ import com.sam.coin.model.util.CompanyName;
 import com.sam.coin.model.util.Currency;
 import com.sam.coin.model.util.Exchange;
 import com.sam.coin.repository.CandleBasedRepository;
-import com.sam.coin.service.exceptions.DataValidationException;
-import com.sam.coin.service.exceptions.DatabaseException;
+import com.sam.coin.exception.DataValidationException;
+import com.sam.coin.exception.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,11 @@ public class CoinCandleService {
     }
 
     public Optional<Company> findByCompanyName(CompanyName companyName) {
-        return candleBasedRepository.findByCompanyName(companyName);
+        try {
+            return candleBasedRepository.findByCompanyName(companyName);
+        } catch (Exception e) {
+            throw new CompanyNotFoundException("Failed to find company in database", e);
+        }
     }
 
     public Company createNewCompany(CompanyName companyName) {

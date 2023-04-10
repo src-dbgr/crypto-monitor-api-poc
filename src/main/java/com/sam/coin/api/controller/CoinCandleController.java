@@ -1,5 +1,7 @@
-package com.sam.coin.api;
+package com.sam.coin.api.controller;
 
+import com.sam.coin.api.ApiResponse;
+import com.sam.coin.exception.UnknownEnumException;
 import com.sam.coin.model.company.Company;
 import com.sam.coin.model.company.exchange.currency.candle.Candle;
 import com.sam.coin.model.util.CompanyName;
@@ -7,14 +9,14 @@ import com.sam.coin.model.util.Currency;
 import com.sam.coin.model.util.Exchange;
 import com.sam.coin.service.CoinCandleService;
 import com.sam.coin.service.CsvService;
-import com.sam.coin.service.exceptions.DataValidationException;
-import com.sam.coin.service.exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import java.beans.PropertyEditorSupport;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +25,43 @@ import java.util.Set;
 public class CoinCandleController {
     private final CoinCandleService coinCandleService;
     private final CsvService csvService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(CompanyName.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String company) {
+                try{
+                    company = company.replace("-","_");
+                    setValue(CompanyName.valueOf(company.toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    throw new UnknownEnumException("Unknown CompanyName value: " + company);
+                }
+            }
+        });
+
+        binder.registerCustomEditor(Currency.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String currency) {
+                try{
+                    setValue(Currency.valueOf(currency.toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    throw new UnknownEnumException("Unknown Currency value: " + currency);
+                }
+            }
+        });
+
+        binder.registerCustomEditor(Exchange.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String exchange) {
+                try{
+                    setValue(Exchange.valueOf(exchange.toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    throw new UnknownEnumException("Unknown Exchange value: " + exchange);
+                }
+            }
+        });
+    }
 
     @Autowired
     public CoinCandleController(CoinCandleService coinCandleService, CsvService csvService) {
@@ -62,18 +101,6 @@ public class CoinCandleController {
     @GetMapping("/{companyName}/candles")
     public Optional<Company> getCandleData(@PathVariable CompanyName companyName) {
         return coinCandleService.findByCompanyName(companyName);
-    }
-
-    @ExceptionHandler(DataValidationException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDataValidationException(DataValidationException ex) {
-        ApiResponse<Object> response = new ApiResponse<>(false, null, ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDatabaseException(DatabaseException ex) {
-        ApiResponse<Object> response = new ApiResponse<>(false, null, ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping("{companyName}/candle-csv")

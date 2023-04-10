@@ -1,4 +1,4 @@
-package com.sam.coin.api;
+package com.sam.coin.api.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;

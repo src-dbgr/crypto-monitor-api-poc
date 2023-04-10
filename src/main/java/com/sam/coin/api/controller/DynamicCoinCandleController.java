@@ -1,4 +1,4 @@
-package com.sam.coin.api;
+package com.sam.coin.api.controller;
 
 import com.sam.coin.model.DynamicEntity;
 import com.sam.coin.service.DynamicCandleService;

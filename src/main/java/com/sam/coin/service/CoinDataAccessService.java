@@ -1,6 +1,6 @@
 package com.sam.coin.service;
 
-import com.sam.coin.api.CoinController;
+import com.sam.coin.api.controller.CoinController;
 import com.sam.coin.dao.CoinDao;
 import com.sam.coin.model.Coin;
 import com.sam.coin.model.CoinsEntries;
@@ -8,18 +8,13 @@ import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
