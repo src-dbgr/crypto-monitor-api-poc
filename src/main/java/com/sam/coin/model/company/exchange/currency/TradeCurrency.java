@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 @NoArgsConstructor
 @Getter
+@Setter
 @EqualsAndHashCode
 @ToString
 public class TradeCurrency {

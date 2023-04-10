@@ -35,24 +35,22 @@ public class CoinCandleService {
     }
 
     public Company createNewCompany(CompanyName companyName) {
-        Optional<Company> companyOptional = candleBasedRepository.findByCompanyName(companyName);
-        Company company = companyOptional.orElseGet(() -> createNewCompanyWithCandleSet(companyName, null, null, null));
-        return candleBasedRepository.save(company);
+        return findByCompanyName(companyName).orElseGet(() -> save(createNewCompanyWithCandleSet(companyName, null, null, null)));
     }
 
     public Set<Candle> getCandleData(CompanyName companyName, Exchange exchange, Currency currency) {
-        Optional<Company> companyOptional = candleBasedRepository.findByCompanyName(companyName);
-        if (companyOptional.isPresent()) {
-            Company company = companyOptional.get();
-            TradeExchange tradeExchange = company.getTradeExchanges().get(exchange);
-            if (tradeExchange != null) {
-                TradeCurrency tradeCurrencyObj = tradeExchange.getTradeCurrencies().get(currency);
-                if (tradeCurrencyObj != null) {
-                    return tradeCurrencyObj.getCandles();
-                }
-            }
-        }
-        return new HashSet<>();
+        return findByCompanyName(companyName)
+                .map(company -> {
+                    TradeExchange tradeExchange = company.getTradeExchanges().get(exchange);
+                    if (tradeExchange != null) {
+                        TradeCurrency tradeCurrency = tradeExchange.getTradeCurrencies().get(currency);
+                        if (tradeCurrency != null) {
+                            return tradeCurrency.getCandles();
+                        }
+                    }
+                    return new HashSet<Candle>();
+                })
+                .orElseGet(HashSet::new);
     }
 
     public Company addCandlesetData(CompanyName companyName, Currency currency, Exchange exchange, Set<Candle> candles) {
@@ -67,6 +65,7 @@ public class CoinCandleService {
                 Map<Currency, TradeCurrency> tradeCurrenciesAffected = tradeExchangesAffected.get(exchange).getTradeCurrencies();
                 if (tradeCurrenciesAffected.containsKey(currency)) {
                     tradeCurrenciesAffected.get(currency).getCandles().addAll(candles); // adds all candles here if exchange and currency already exists
+                    tradeCurrenciesAffected.get(currency).setCandles(filterDuplicateCandles(tradeCurrenciesAffected.get(currency).getCandles()));
                 } else {
                     tradeCurrenciesAffected.put(currency, new TradeCurrency(currency, candles)); // exchange exists but not the currency, add the currency and add all candles info
                 }
@@ -94,6 +93,7 @@ public class CoinCandleService {
                 Map<Currency, TradeCurrency> tradeCurrenciesAffected = tradeExchangesAffected.get(exchange).getTradeCurrencies();
                 if (tradeCurrenciesAffected.containsKey(currency)) {
                     tradeCurrenciesAffected.get(currency).getCandles().add(candle); // adds Candle here if exchange and currency already exists
+                    tradeCurrenciesAffected.get(currency).setCandles(filterDuplicateCandles(tradeCurrenciesAffected.get(currency).getCandles()));
                 } else {
                     tradeCurrenciesAffected.put(currency, new TradeCurrency(currency, createNewCandleSet(candle))); // exchange exists but not the currency, add the currency and add the candle info
                 }
@@ -108,7 +108,30 @@ public class CoinCandleService {
         }
     }
 
+    public Company removeDuplicateCandles(CompanyName companyName, Currency currency, Exchange exchange) {
+        try {
+            Optional<Company> companyOptional = candleBasedRepository.findByCompanyName(companyName);
+            if (companyOptional.isPresent()) {
+                Company company = companyOptional.get();
+                Set<Candle> candles = company.getTradeExchanges().get(exchange).getTradeCurrencies().get(currency).getCandles();
+                candles = filterDuplicateCandles(candles);
+                company.getTradeExchanges().get(exchange).getTradeCurrencies().get(currency).setCandles(candles);
+                return candleBasedRepository.save(company);
+            }
+            return null;
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to remove duplcates and save candle data", e);
+        }
+    }
+
+    public Set<Candle> filterDuplicateCandles(Set<Candle> candleSet) {
+        Map<Number, Candle> uniqueCandles = new LinkedHashMap<>();
+        candleSet.forEach(candle -> uniqueCandles.putIfAbsent(candle.getCandleValues().get(0), candle));
+        return new HashSet<>(uniqueCandles.values());
+    }
+
     private boolean isValidCandleSet(Set<Candle> candles) {
+        candles = filterDuplicateCandles(candles);
         if (candles == null || candles.isEmpty()) {
             return false;
         }

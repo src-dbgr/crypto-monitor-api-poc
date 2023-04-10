@@ -52,6 +52,13 @@ public class CoinCandleController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{companyName}/removeduplicates")
+    public ResponseEntity<ApiResponse<Company>> addCandleData(@PathVariable CompanyName companyName, @RequestParam Currency currency, @RequestParam Exchange exchange) {
+        Company updatedCompany = coinCandleService.removeDuplicateCandles(companyName, currency, exchange);
+        ApiResponse<Company> response = new ApiResponse<>(true, updatedCompany, "Candle duplicates updated successfully");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{companyName}/candles")
     public Optional<Company> getCandleData(@PathVariable CompanyName companyName) {
         return coinCandleService.findByCompanyName(companyName);
@@ -71,8 +78,8 @@ public class CoinCandleController {
 
     @GetMapping("{companyName}/candle-csv")
     public ResponseEntity<String> getCandleDataAsCSV(@PathVariable CompanyName companyName,
-                                                     @RequestParam Currency currency,
-                                                     @RequestParam Exchange exchange) {
+                                                     @RequestParam Exchange exchange,
+                                                     @RequestParam Currency currency) {
         Set<Candle> candles = coinCandleService.getCandleData(companyName, exchange, currency);
         String csvData = csvService.convertCandleDataToCSV(candles);
 
