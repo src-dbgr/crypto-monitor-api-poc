@@ -8,6 +8,7 @@ import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -45,6 +46,23 @@ public class CoinDataAccessService implements CoinDao {
 //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp, datetime, high, low, bid, ask, vwap, close, last, basevolume, quotevolume, isymbol, ipricechange, ipricechangeprcnt, iweightedavgprice, iprevcloseprice, ilastprice, ilastqty, ibidprice, iaskprice, iaskqty, iopenprice, ihighprice, ilowprice, ivolume, iquotevolume, iopentime, iclosetime, ifirstid, ilastid, icount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String INSERT_COIN = "INSERT INTO %s (id, time_stamp, symbol, coin_id, coin_name, price_eur, price_usd, price_btc, price_eth, market_cap_eur, market_cap_usd, market_cap_btc, market_cap_eth, total_volume_eur, total_volume_usd, total_volume_btc, total_volume_eth, twitter_followers, reddit_avg_posts_48_hours, reddit_avg_comments_48_hours, reddit_accounts_active_48_hours, reddit_subscribers, dev_forks, dev_stars, dev_total_issues, dev_closed_issues, dev_pull_requests_merged, dev_pull_request_contributors, dev_commit_count_4_weeks, dev_code_additions_4_weeks, dev_code_deletions_4_weeks, public_alexa_rank) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 //	private static final String INSERT_COIN = "INSERT INTO coins (id, symbol, timestmp, datetime, high, low, bid, ask, vwap, close, last, basevolume, quotevolume) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String SQL_GET_LAST_VALID_DATE_FOR_COIN =
+            "WITH ranked_coins AS (" +
+                    "    SELECT time_stamp, " +
+                    "           ROW_NUMBER() OVER (ORDER BY time_stamp DESC) AS rn " +
+                    "    FROM ? " +
+                    "    WHERE time_stamp <= CURRENT_DATE - INTERVAL '5 days'" +
+                    ") " +
+                    "SELECT MAX(time_stamp) AS last_valid_date " +
+                    "FROM ranked_coins " +
+                    "WHERE rn <= 5 " +
+                    "HAVING COUNT(*) = 5";
+
+    private static final Map<String, String> COIN_TABLE_MAPPING = Map.of(
+            "bitcoin", "coins"
+            // add more mappings if required
+    );
 
     Set<String> tableNames = Set.of("ampleforth", "zilliqa", "vechain", "bitcoin_diamond", "litecoin", "compound_ether", "compound_coin", "waves", "uma", "bzx_protocol", "band_protocol", "ocean_protocol", "theta_token", "singularitynet", "thorchain", "kava", "ethereum", "algorand", "cardano", "chainlink", "polkadot", "stellar", "zcash", "coins");
 
@@ -279,6 +297,20 @@ public class CoinDataAccessService implements CoinDao {
         return fetchDataAndGenerateCsv(SELECT_ALL_COINS_FROM_TABLE_QUERY);
     }
 
+    @Override
+    public Date getLastValidDateForCoin(String coinId) {
+        coinId = coinId.replace("-", "_");
+        String lowercaseCoinId = coinId.toLowerCase();
+        String tableName = COIN_TABLE_MAPPING.getOrDefault(lowercaseCoinId, lowercaseCoinId);
+
+        String sql = SQL_GET_LAST_VALID_DATE_FOR_COIN.replace("?", tableName);
+
+        try {
+            return jdbcTemplate.queryForObject(sql, Date.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 
     private String fetchDataAndGenerateCsv(String query) {
         return jdbcTemplate.query(query, new ResultSetExtractor<String>() {

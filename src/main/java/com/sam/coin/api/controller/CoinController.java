@@ -12,6 +12,7 @@ import com.sam.coin.model.TableInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -126,4 +127,13 @@ public class CoinController {
         return coinService.exportTableToCsv(tableName);
     }
 
+    @GetMapping(path = "lastValidDate")
+    public ResponseEntity<?> getLastValidDateForCoin(@RequestParam String coinId) {
+        try {
+            Date lastValidDate = coinService.getLastValidDateForCoin(coinId);
+            return ResponseEntity.ok(Collections.singletonMap(coinId, lastValidDate));
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

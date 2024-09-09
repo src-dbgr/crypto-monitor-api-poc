@@ -277,8 +277,8 @@ PW: `password`
   - Click on the gear wheel on the left side > Configuration > Data Sources > Add data source
   - Choose PostgreSQL
   - Give it some name
-    - Host: `host.docker.internal:5433`
-    - Database: `cryptobackup`
+    - Host: `host.docker.internal:5432`
+    - Database: `coin`
     - User: `postgres`
     - Password: `password`
     - SSL Mode: `disable` (since it runs only local this is ok)

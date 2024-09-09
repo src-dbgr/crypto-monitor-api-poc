@@ -13,21 +13,6 @@ This project is a Spring Boot application for monitoring cryptocurrency informat
 
 1. Clone the repository:
 
-# Crypto Monitor API
-
-This project is a Spring Boot application for monitoring cryptocurrency information.
-
-## Prerequisites
-
-- Docker
-- Docker Compose
-- Java 21
-- Maven
-
-## Setup
-
-1. Clone the repository:
-
 2. Start the PostgreSQL database and pgAdmin:
    ```
    docker-compose up -d
@@ -60,22 +45,40 @@ This project is a Spring Boot application for monitoring cryptocurrency informat
    \q
    ```
 
-9. Build the Spring Boot application:
+9. Add some data to the Database.
+   9.1. cd into `crypto-monitoring-api-poc/misc/dbbackup`
+   9.2. unpack `coinbackup.rar`
+   9.3. add data to `coin` database
+   ```
+   docker exec -i postgres-coin psql -U postgres -d coin < coinbackup.sql
+   ```
+
+10. Build the Spring Boot application:
    ```
    mvn clean install -DskipTests
    ```
 
-10. Run the Spring Boot application:
+11. Run the Spring Boot application:
     ```
     java -jar target/coin-0.0.1-SNAPSHOT.jar
     ```
+
+## Set Up Grafana
+
+1. Add a new PostgreSQL Datasource
+2. Click on `Build a dashboard`
+3. Choose "Import dashboard"
+4. Choose "Upload dashboard JSON file"
+5. Select a JSON file from `crypto-monitoring-api-poc\misc\grafana\<some-file-name>.json`
+6. Click on "Import"
+7. 
 
 ## Accessing pgAdmin
 
 1. Open a web browser and go to `http://localhost:5050`
 2. Login with:
-    - Email: `admin@example.com`
-    - Password: `adminpassword`
+    - Email: `user@example.com`
+    - Password: `password`
 
 3. Add a new server in pgAdmin:
     - Host: `postgres`
