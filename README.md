@@ -5,7 +5,7 @@
 ## Purpose of this application
 
 - This application is part of a POC which aims at the following
-  - Learn and Understand
+  - Playground for Data visualization and statistics 
   - Connecting multiple Docker-based services to establish a data source for Grafana dashboards where monitoring of cryptocurrency information shall take place
   - This Maven-based Spring Boot backend application shall provide a REST API that handles CRUD operations persisted in a PostgreSQL database for Cryptocurrency information such as price performance over time
   - For price updates, a separate crypto client is in place (the client is covered separately), which serves as the man in the middle between the cryptocurrency web service (in this case, coingecko.com) and this Spring Boot backend server
@@ -21,6 +21,119 @@
 - You have Maven installed
 - Git bash (if you are on Windows)
 
+## Setup
+
+1. Clone the repository:
+
+2. Navigate to the root of the repo and start the PostgreSQL database and pgAdmin:
+   ```
+   docker-compose up -d
+   ```
+
+3. Wait for about 10-15 seconds to ensure the PostgreSQL container is fully up and running.
+
+4. Connect to the PostgreSQL container:
+   ```
+   docker exec -it postgres-coin psql -U postgres
+   ```
+
+5. Create the 'coin' database:
+   ```sql
+   CREATE DATABASE coin;
+   ```
+
+6. Connect to the 'coin' database:
+   ```sql
+   \c coin
+   ```
+
+7. Create the UUID extension:
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+   ```
+
+8. Exit the PostgreSQL prompt:
+   ```
+   \q
+   ```
+
+9. Add some data to the Database.
+   * 9.1. cd into `crypto-monitoring-api-poc/misc/dbbackup`
+   * 9.2. unpack `coinbackup.rar`
+   * 9.3. add data to `coin` database
+   ```
+   docker exec -i postgres-coin psql -U postgres -d coin < coinbackup.sql
+   ```
+
+10. Build the Spring Boot application:
+   ```
+   mvn clean install -DskipTests
+   ```
+
+11. Run the Spring Boot application:
+    ```
+    java -jar target/docker-spring-boot-exec.jar
+    ```
+    Or simply import it into your IDE and start it there. It will run at port 8080.    
+
+## Set Up Grafana
+
+1. Open Grafana in your browser `localhost:3000` and login (usually the initial access it's user: admin, pw: admin)
+2. Add a new PostgreSQL Datasource. Connections > Data Sources > + Add new data source > postgres > Connection:HostURL = host.docker.internal:5432, Database name: coin, Username: postgres, TLS/SSL Mode: disable > Save & test 
+3. Click on `Build a dashboard`
+4. Choose "Import dashboard"
+5. Choose "Upload dashboard JSON file"
+6. Select a JSON file from `crypto-monitoring-api-poc\misc\grafana\<some-file-name>.json`
+7. Click on "Import"
+8. Save the dashboard if there are no errors
+
+## Accessing pgAdmin
+
+1. Open a web browser and go to `http://localhost:5050`
+2. Login with:
+  - Email: `user@example.com`
+  - Password: `password`
+
+3. Add a new server in pgAdmin:
+  - Host: `postgres`
+  - Port: `5432`
+  - Maintenance database: `coin`
+  - Username: `postgres`
+  - Password: `password`
+
+## API Usage
+
+The API should now be running on `http://localhost:8080`. You can use tools like Postman or curl to interact with the endpoints defined in your controllers.
+
+## Stopping the Application
+
+1. Stop the Spring Boot application (Ctrl+C in the terminal where it's running)
+2. Stop the Docker containers:
+   ```
+   docker-compose down
+   ```
+
+## Additional Notes
+
+- The specific table structures and schemas will be created by your Spring Boot application using JPA/Hibernate when it first runs.
+- Make sure your `application.yml` or `application.properties` file in the Spring Boot project is configured to connect to the PostgreSQL database:
+
+  ```yaml
+    app:
+      datasource:
+        jdbc-url: jdbc:postgresql://localhost:5432/coin
+        username: postgres
+        password: password
+        pool-size: 30
+    
+    spring:
+      data:
+        mongodb:
+          uri: mongodb://mongoadmin:password@localhost:27017/coin_candles?authSource=admin
+  ```
+
+- If you need to make any manual changes to the database schema or add initial data, you can do so by connecting to the database using the steps 4-8 above.
+
 ### Starting the application
 
 - Before this application can be started, there are some steps to be taken, such as setting up a local docker database described in the following steps. However, the class you will need eventually to run is: "CoinApplication.java" but step by step. Here are some general Infos which you should notice:
@@ -31,6 +144,11 @@
 ### Architecture
 
 ![Architecture](src/main/resources/Architecture.png)
+
+## Adding new Coin Data
+* In order to add some new crypto data you can utilize the [crypto-client-poc](https://github.com/src-dbgr/crypto-client-poc)
+
+## The following section covers general information that should ease troubleshooting or setup issues
 
 ### [INFO] SWAP Database implementation via Dependecy Injection
 
@@ -65,7 +183,7 @@
    > **Note:** By default, Flyway looks at files in the format V$X__$DESCRIPTION.sql, where $X is the migration version name, in folder src/main/resources/db/migration.
    > Go to https://flywaydb.org/documentation/api/ to find more details
 3. Insert the following SQL command
-   `CREATE TABLE person ( id UUID NOT NULL PRIMARY KEY, name VARCHAR(100) NOT NULL );`
+   `CREATE TABLE coin ( id UUID NOT NULL PRIMARY KEY, name VARCHAR(100) NOT NULL );`
 
 ### [IMPORTANT] Initial Start a Postgres DB in a Docker Container
 
@@ -277,8 +395,8 @@ PW: `password`
   - Click on the gear wheel on the left side > Configuration > Data Sources > Add data source
   - Choose PostgreSQL
   - Give it some name
-    - Host: `host.docker.internal:5433`
-    - Database: `cryptobackup`
+    - Host: `host.docker.internal:5432`
+    - Database: `coin`
     - User: `postgres`
     - Password: `password`
     - SSL Mode: `disable` (since it runs only local this is ok)
@@ -307,7 +425,7 @@ PW: `password`
   Stop: `misc\stop-docker.bat`
 
 
-## MONGO DB COMMUNICATION
+## MONGO DB COMMUNICATION (Experimental)
 In order to utilize the endpoins in `CoinCandleController` make sure that you have set up a local Mongo DB.
 
 You can set up a local Mongo DB in Docker via:

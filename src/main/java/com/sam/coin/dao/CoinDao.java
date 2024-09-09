@@ -34,4 +34,5 @@ public interface CoinDao {
     boolean updateCoinByID(UUID id, Coin coin);
     String exportTableToCsv(String tableName);
 
+    Date getLastValidDateForCoin(String coinId);
 }

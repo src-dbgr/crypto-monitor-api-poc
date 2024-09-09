@@ -74,4 +74,9 @@ public class CoinService {
 	public String exportTableToCsv(String tableName) {
 		return coinDao.exportTableToCsv(tableName);
 	}
+
+	public Date getLastValidDateForCoin(String coinId) {
+		return coinDao.getLastValidDateForCoin(coinId);
+	}
+
 }
