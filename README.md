@@ -367,11 +367,11 @@ PW: `password`
 - go into the project directory
 - execute:
 
-  `docker build -f Dockerfile -name docker-spring-boot -t docker-spring-boot .`
+  `docker build -f Dockerfile -t coin-exec .`
 
 ### [INFO] Run this application in a Docker Container
 
-`docker run -d -p 8080:8080 --name docker-spring-boot docker-spring-boot`
+`docker run -d -p 8080:8080 --name coin-exec coin-exec`
 
 > **Note:** Running the app in a Docker Container requires a change in 'application.yaml' to find the Database, the following line needs to be entered:
 > `jdbc-url: jdbc:postgresql://host.docker.internal:5432/cryptobackup`
