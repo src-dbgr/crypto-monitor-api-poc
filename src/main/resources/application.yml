@@ -4,8 +4,3 @@ app:
     username: postgres
     password: password
     pool-size: 30
-
-spring:
-  data:
-    mongodb:
-      uri: mongodb://mongoadmin:password@localhost:27017/coin_candles?authSource=admin
