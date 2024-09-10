@@ -1,6 +1,4 @@
-# Getting Started
-
-##### This Spring application was initialized with `https://start.spring.io/`
+# Crypto Monitor Api POC
 
 ## Purpose of this application
 
@@ -10,7 +8,7 @@
   - This Maven-based Spring Boot backend application shall provide a REST API that handles CRUD operations persisted in a PostgreSQL database for Cryptocurrency information such as price performance over time
   - For price updates, a separate crypto client is in place (the client is covered separately), which serves as the man in the middle between the cryptocurrency web service (in this case, coingecko.com) and this Spring Boot backend server
 
-> **Note:** In case there are any compile issues, I used [OpenJDK 11 with OpenJ9 JVM](https://adoptopenjdk.net/?variant=openjdk11&jvmVariant=openj9) for this application.
+> **Note:** In case there are any compile issues, I used [Eclispe Temurin Java 21 LTS](https://adoptium.net/de/temurin/releases/) for this application.
 
 > **Note:** The following description contains the steps you need to take starting the application and also helpful background information, which I prefix with [INFO], essential steps you need to take care of are highlighted with [IMPORTANT]
 
@@ -125,11 +123,6 @@ The API should now be running on `http://localhost:8080`. You can use tools like
         username: postgres
         password: password
         pool-size: 30
-    
-    spring:
-      data:
-        mongodb:
-          uri: mongodb://mongoadmin:password@localhost:27017/coin_candles?authSource=admin
   ```
 
 - If you need to make any manual changes to the database schema or add initial data, you can do so by connecting to the database using the steps 4-8 above.
@@ -423,86 +416,3 @@ PW: `password`
 - Stack contains: Postgres DB Docker Container, Spring Boot App Docker Container), Grafana Docker Container
   Start: `misc\start-docker.bat`
   Stop: `misc\stop-docker.bat`
-
-
-## MONGO DB COMMUNICATION (Experimental)
-In order to utilize the endpoins in `CoinCandleController` make sure that you have set up a local Mongo DB.
-
-You can set up a local Mongo DB in Docker via:
-```
-docker pull mongo
-docker run -d -p 27017:27017 --name mongodb -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=password mongo
-```
-The file `application.yml` contains already the connectivity information for the above user and password
-You may change the user and the pw as you like.
-```
-spring:
-  data:
-    mongodb:
-      uri: mongodb://mongoadmin:password@localhost:27017/coin_candles?authSource=admin
-```
->Note: The suffix `coin_candles` is the name of the database, you don't need to create it explicitly, if such database is not in place on your MongoDB then mongo will just create it with the initial save request to it. You may change the database name as you like.
-
-To administer the Mongo DB it is recommended to also install MongoDB Compass from the official Mongo DB download page:
-[MongoDB Compass Download](https://www.mongodb.com/try/download/compass)
-
-Connecting to MongoDB Compass is straight foraward, simply utilize the user and password authentication and the local MongoDB url which is defined in the `application.yml`.
-
-- A `Candle` payload should have the following structure
-```
-  {
-      "i": 1,
-      "v": [
-          1631750400,
-          38.70,
-          50.33,
-          31.10,
-          39.70
-      ]
-  }
-```
-- A `Set<Candle>` payload should have the following structure 
-````
-[
-    {
-        "i": 1,
-        "v": [
-            1631750400,
-            38.70,
-            50.33,
-            31.10,
-            39.70
-        ]
-    },
-    {
-        "i": 2,
-        "v": [
-            1631836800,
-            39.70,
-            60.33,
-            41.10,
-            49.70
-        ]
-    },
-    {
-        "i": 3,
-        "v": [
-            1631923200,
-            49.70,
-            40.33,
-            41.10,
-            59.70
-        ]
-    }
-]
-````
-
-- You can send a PUT request via Postman to try the API, for example to this URL:
-`http://localhost:8080/api/v1/coincandle/BITCOIN/candleset?curreny=USD&exchange=BINANCE`
-
-> Note, you have the query parameter `currency` and `exchange` these must be set to allowed Enum values
-
-Add the above example to the request body - this corresponds to a `Set<Candle>`
-
-The request will store the data to your local Mongo DB.
-
