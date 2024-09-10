@@ -1,4 +1,4 @@
-package com.sam.coin.model;
+package com.sam.coin.domain.model;
 
 import java.sql.Timestamp;
 

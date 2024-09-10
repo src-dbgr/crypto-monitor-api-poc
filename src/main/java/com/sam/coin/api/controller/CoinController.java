@@ -1,30 +1,41 @@
 package com.sam.coin.api.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-
-import com.sam.coin.service.CoinDataAccessService.OrderBy;
-import com.sam.coin.model.TableInfo;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
+import com.sam.coin.domain.model.Coin;
+import com.sam.coin.exception.CoinNotFoundException;
+import com.sam.coin.service.CoinService;
+import com.sam.coin.api.SamApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
-import com.sam.coin.model.Coin;
-import com.sam.coin.service.CoinService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/coin")
+@RequestMapping("/api/v1/coins")
+@Validated
+@Tag(name = "Coin", description = "The Coin API")
 public class CoinController {
-    private static final Logger LOG = LoggerFactory.getLogger(CoinController.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(CoinController.class);
+
     private final CoinService coinService;
 
     @Autowired
@@ -32,107 +43,118 @@ public class CoinController {
         this.coinService = coinService;
     }
 
+    @Operation(summary = "Add a new coin", description = "Adds a new coin to the database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Coin created",
+                    content = @Content(schema = @Schema(implementation = Coin.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
     @PostMapping
-    public void addCoin(@Valid @NonNull @RequestBody Coin coin) {
-        coinService.addCoin(coin);
-        LOG.info("Added new coin: " + coin.getSymbol());
+    public ResponseEntity<SamApiResponse<Coin>> addCoin(@Valid @RequestBody Coin coin) {
+        logger.info("Received request to add new coin: {}", coin.getSymbol());
+        Coin savedCoin = coinService.saveCoin(coin);
+        logger.debug("Coin added successfully with ID: {}", savedCoin.getId());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new SamApiResponse<>(true, savedCoin, "Coin added successfully"));
     }
 
-    @GetMapping(path = "{table}/all")
-    public List<Coin> getAllCoins(String tableName) {
-        //TODO
-        return null;
-//		return coinService.getAllCoins();
+    @Operation(summary = "Get all coins", description = "Retrieves a list of all coins")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(schema = @Schema(implementation = Coin.class)))
+    })
+    @GetMapping
+    public ResponseEntity<SamApiResponse<List<Coin>>> getAllCoins() {
+        logger.info("Received request to get all coins");
+        List<Coin> coins = coinService.getAllCoins();
+        logger.debug("Retrieved {} coins", coins.size());
+        return ResponseEntity.ok(new SamApiResponse<>(true, coins, "Coins retrieved successfully"));
     }
 
-    @DeleteMapping(path = "{id}")
-    public void deleteCoin(@PathVariable("id") UUID id) {
-        coinService.deleteCoinByID(id);
-    }
-
-    @GetMapping(path = "count")
-    public Map<String, TableInfo> countAllEntries(@RequestParam(defaultValue = "alphabetical") String orderBy) {
-        if (orderBy.equals("numeric")) {
-            return coinService.countAllEntries(OrderBy.COUNT);
-        } else if (orderBy.equals("date")) {
-            return coinService.countAllEntries(OrderBy.DATE);
-        }
-        return coinService.countAllEntries(OrderBy.ALPHABETICAL);
-    }
-
-    @GetMapping(path = "{table}/count")
-    public Map<String, TableInfo> selectCoinByTableNameAndId(@PathVariable("table") String tableName) {
-        Map<String, TableInfo> result = new HashMap<String, TableInfo>();
+    @Operation(summary = "Get a coin by ID", description = "Retrieves a coin by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(schema = @Schema(implementation = Coin.class))),
+            @ApiResponse(responseCode = "404", description = "Coin not found")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<SamApiResponse<Coin>> getCoinById(
+            @Parameter(description = "ID of the coin to retrieve") @PathVariable("id") @NotNull UUID id) {
+        logger.info("Received request to get coin with ID: {}", id);
         try {
-            result.put(tableName, coinService.countAllEntries(OrderBy.ALPHABETICAL).get(tableName));
-            return result;
-        } catch (Exception e) {
-            LOG.error("Failed to find info for Table Name {}", tableName, e);
+            Coin coin = coinService.getCoinById(id);
+            logger.debug("Retrieved coin: {}", coin.getSymbol());
+            return ResponseEntity.ok(new SamApiResponse<>(true, coin, "Coin retrieved successfully"));
+        } catch (CoinNotFoundException e) {
+            logger.warn("Coin not found with ID: {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new SamApiResponse<>(false, null, e.getMessage()));
         }
-        return result;
     }
 
-    @GetMapping(path = "{table}/id/{id}")
-    public Optional<Coin> selectCoinByTableNameAndId(@PathVariable("table") String tableName, @PathVariable("id") UUID id) {
-        return coinService.selectCoinByTableNameAndId(tableName, id);
+    @Operation(summary = "Get coins by date range", description = "Retrieves a list of coins within a specified date range")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(schema = @Schema(implementation = Coin.class)))
+    })
+    @GetMapping("/date-range")
+    public ResponseEntity<SamApiResponse<List<Coin>>> getCoinsByDateRange(
+            @Parameter(description = "Start date") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @Parameter(description = "End date") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        logger.info("Received request to get coins between {} and {}", startDate, endDate);
+        List<Coin> coins = coinService.getCoinsByDateRange(startDate, endDate);
+        logger.debug("Retrieved {} coins for the specified date range", coins.size());
+        return ResponseEntity.ok(new SamApiResponse<>(true, coins, "Coins retrieved successfully"));
     }
 
-    // Date Pattern yyyy-mm-dd
-    // 2020-09-04 <- 4th September of 2020
-    @GetMapping(path = "{table}/date/{date}")
-    public List<Coin> selectCoinByTableNameAndDate(@PathVariable("table") String tableName, @PathVariable("date") String date) {
-        List<Coin> coins = coinService.selectCoinByTableNameAndDate(tableName, date);
-        return coins;
+    @Operation(summary = "Get coins by coin ID and date range", description = "Retrieves a list of coins for a specific coin ID within a date range")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(schema = @Schema(implementation = Coin.class)))
+    })
+    @GetMapping("/coin-id/{coinId}/date-range")
+    public ResponseEntity<SamApiResponse<List<Coin>>> getCoinsByCoinIdAndDateRange(
+            @Parameter(description = "ID of the coin") @PathVariable @NotBlank String coinId,
+            @Parameter(description = "Start date") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @Parameter(description = "End date") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+        logger.info("Received request to get coins for coinId: {} between {} and {}", coinId, startDate, endDate);
+        List<Coin> coins = coinService.getCoinsByCoinIdAndDateRange(coinId, startDate, endDate);
+        logger.debug("Retrieved {} coins for coinId: {} and specified date range", coins.size(), coinId);
+        return ResponseEntity.ok(new SamApiResponse<>(true, coins, "Coins retrieved successfully"));
     }
 
-    @GetMapping(path = "{table}/duplicates")
-    public Map<Integer, List<Coin>> getAllDuplicatesWithSameDate(@PathVariable("table") String tableName) {
-        List<Coin> coins = coinService.getAllDuplicatesWithSameDate(tableName);
-        HashMap<Integer, List<Coin>> result = new HashMap<>();
-        result.put(coins.size(), coins);
-        return result;
+    @Operation(summary = "Get count of coins by coin ID", description = "Retrieves the count of coins for a specific coin ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(schema = @Schema(implementation = Long.class)))
+    })
+    @GetMapping("/count/{coinId}")
+    public ResponseEntity<SamApiResponse<Long>> getCountByCoinId(
+            @Parameter(description = "ID of the coin") @PathVariable @NotBlank String coinId) {
+        logger.info("Received request to get count for coinId: {}", coinId);
+        long count = coinService.getCountByCoinId(coinId);
+        logger.debug("Count for coinId {}: {}", coinId, count);
+        return ResponseEntity.ok(new SamApiResponse<>(true, count, "Count retrieved successfully"));
     }
 
-    @DeleteMapping(path = "{table}/duplicates")
-    public int deleteDuplicatesWithSameDate(@PathVariable("table") String tableName) {
-        return coinService.deleteDuplicatesWithSameDate(tableName);
+    @Operation(summary = "Delete a coin", description = "Deletes a coin by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "404", description = "Coin not found")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<SamApiResponse<Void>> deleteCoin(
+            @Parameter(description = "ID of the coin to delete") @PathVariable("id") @NotNull UUID id) {
+        logger.info("Received request to delete coin with ID: {}", id);
+        coinService.deleteCoin(id);
+        logger.debug("Coin with ID: {} deleted successfully", id);
+        return ResponseEntity.ok(new SamApiResponse<>(true, null, "Coin deleted successfully"));
     }
 
-    @PutMapping(path = "{id}")
-    public void updateCoin(@PathVariable("id") UUID id, @Valid @NonNull @RequestBody Coin coinToUpdate) {
-        LOG.debug("PUT ID: " + id);
-        coinService.updateCoin(id, coinToUpdate);
-    }
-
-    @GetMapping(value = "{tableName}/export", produces = "text/csv")
-    public ResponseEntity<String> exportTableToCsv(@PathVariable("tableName") String tableName, HttpServletResponse response) throws IOException {
-        String csvData = coinService.exportTableToCsv(tableName);
-        // Set up the response headers for CSV file download
-        String fileName = tableName + "_export.csv";
-        response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-        // Write the CSV data to the response body
-        try (PrintWriter writer = response.getWriter()) {
-            writer.write(csvData);
-        }
-
-        // Return an empty response
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping(value = "{tableName}/exporttext", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String exportTableToCsv(@PathVariable("tableName") String tableName) throws IOException {
-        return coinService.exportTableToCsv(tableName);
-    }
-
-    @GetMapping(path = "lastValidDate")
-    public ResponseEntity<?> getLastValidDateForCoin(@RequestParam String coinId) {
-        try {
-            Date lastValidDate = coinService.getLastValidDateForCoin(coinId);
-            return ResponseEntity.ok(Collections.singletonMap(coinId, lastValidDate));
-        } catch (EmptyResultDataAccessException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<SamApiResponse<Void>> handleException(Exception e) {
+        logger.error("An unexpected error occurred", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new SamApiResponse<>(false, null, "An error occurred: " + e.getMessage()));
     }
 }

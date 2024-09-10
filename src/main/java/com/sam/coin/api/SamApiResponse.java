@@ -8,7 +8,7 @@ import lombok.*;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiResponse<T> {
+public class SamApiResponse<T> {
     private boolean success;
     private T data;
     private String message;
