@@ -70,7 +70,7 @@
 
 11. Run the Spring Boot application:
     ```
-    java -jar target/docker-spring-boot-exec.jar
+    java -jar target/coin-exec.jar
     ```
     Or simply import it into your IDE and start it there. It will run at port 8080.    
 
@@ -148,10 +148,10 @@ The API should now be running on `http://localhost:8080`. You can use tools like
 - Class `CoinService.java`
 - Line #22 in Constructor `CoinService`
 - Add `@Qualifier` Annotation
-- This replaces the Interface with a chosen impmlementation
+- This replaces the Interface with a chosen implementation
 - Example `public CoinService(@Qualifier("postgres") CoinDao coinDao)`
 
-> **Note:** Look which classes implement the CoinDao Interface, for instance, CoinDataAcessService
+> **Note:** Look which classes implement the CoinDao Interface, for instance, CoinDataAccessService
 
 ### [INFO] Logging
 
@@ -272,8 +272,8 @@ PW: `password`
 
 > **Note:** In case you want to access the Postgres Database, which runs in the Docker Container from within pgAdmin
 
-- Klick "Add New Server"
-- Klick Tab "Connection"
+- Click "Add New Server"
+- Click Tab "Connection"
 - Add the following properties
 
 > Host name/address: `host.docker.internal`
@@ -413,6 +413,6 @@ PW: `password`
 ### [INFO] Start / Stop Stack
 
 - For simplicity, I have added some simple batch scripts which start
-- Stack contains: Postgres DB Docker Container, Spring Boot App Docker Container), Grafana Docker Container
+- Stack contains: Postgres DB Docker Container, Spring Boot App Docker Container, Grafana Docker Container
   Start: `misc\start-docker.bat`
   Stop: `misc\stop-docker.bat`

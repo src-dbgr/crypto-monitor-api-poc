@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import com.sam.coin.service.CoinDataAccessService.OrderBy;
 import com.sam.coin.model.TableInfo;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
