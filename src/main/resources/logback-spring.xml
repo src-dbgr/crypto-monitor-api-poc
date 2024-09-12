@@ -6,7 +6,7 @@
 		<property name="LOG_FILE" value="logs/app.log" />
 		<include
 			resource="org/springframework/boot/logging/logback/file-appender.xml" />
-		<root level="ERROR">
+		<root level="INFO">
 			<appender-ref ref="FILE" />
 		</root>
 	</springProfile>
@@ -20,7 +20,7 @@
 				</pattern>
 			</encoder>
 		</appender>
-		<root level="INFO">
+		<root level="DEBUG">
 			<appender-ref ref="STDOUT" />
 		</root>
 
