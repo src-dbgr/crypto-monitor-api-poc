@@ -85,7 +85,7 @@
     ```
     Or simply import it into your IDE and start it there. It will run at port 8080.    
 
-7. [IMPORTANT] Monitor Flyway migrations:
+7. Monitor Flyway migrations (You can perform this step also when pgAdmin is installed as the GUI makes it easier to visualize the tables):
 - Check application logs for Flyway-related messages during startup.
 - After startup, you can verify migrations by checking the `flyway_schema_history` table in your database.
 
@@ -106,9 +106,9 @@
 2. Login with:
   - Email: `user@example.com`
   - Password: `password`
-
-3. Add a new server in pgAdmin:
-  - Host: `postgres`
+3. Right click on Servers > Register > Server ... > Add some Name in Tab "General" >  click on Tab "Connection"
+4. Add a new server in pgAdmin:
+  - Host name/address: `postgres`
   - Port: `5432`
   - Maintenance database: `coin`
   - Username: `postgres`
@@ -194,37 +194,69 @@ To explore and test the API:
 
 ## The following section covers general information that should ease troubleshooting or setup issues
 
-### [INFO] SWAP Database implementation via Dependecy Injection
+### [INFO] Extending or Changing Database Implementation
 
-- Class `CoinService.java`
-- Line #22 in Constructor `CoinService`
-- Add `@Qualifier` Annotation
-- This replaces the Interface with a chosen implementation
-- Example `public CoinService(@Qualifier("postgres") CoinDao coinDao)`
+To extend or change the database implementation, follow these steps:
 
-> **Note:** Look which classes implement the CoinDao Interface, for instance, CoinDataAccessService
+1. Create a new implementation of the `CoinRepository` interface:
+    - Create a new class in the `com.sam.coin.repository` package
+    - Implement all methods defined in `CoinRepository`
+
+2. Annotate your new class with `@Repository` and give it a unique name:
+   ```java
+   @Repository("newDatabaseImpl")
+   public class NewDatabaseRepository implements CoinRepository {
+       // Implementation
+   }
+   ```
+
+3. In `CoinService.java`, use the `@Qualifier` annotation to specify which implementation to use:
+   ```java
+   @Service
+   public class CoinService {
+       private final CoinRepository coinRepository;
+
+       public CoinService(@Qualifier("newDatabaseImpl") CoinRepository coinRepository) {
+           this.coinRepository = coinRepository;
+       }
+       // Rest of the service
+   }
+   ```
+
+4. Update `application.yml` with any new database connection properties if required.
+
+5. If using a different database system, add appropriate dependencies to `pom.xml`.
+
+> **Note:** Ensure your new implementation handles all necessary database operations and follows the same transaction management approach as the existing implementation.
 
 ### [INFO] Logging
 
 - Logging behavior is defined in `src/main/resources/logback-spring.xml`
-- Here, two profiles are created `dev` and `prod`
-- `prod` logs to a log file `app.log` located in folder `logs`
-- `dev` logs into the console
-- Either profile can be activated in `src/main/resources/application.properties`
+- Two profiles are available: `dev` and `prod`
+- `prod` logs to a file `app.log` in the `logs` folder
+- `dev` logs to the console
+- Activate either profile in `src/main/resources/application.yml`
 
-### [IMPORTANT] Database Definition in Project
+### [IMPORTANT] Database Configuration
 
-- See the file `src/main/resources/application.yml` -> Contains Database Connection Properties, make sure that the data provided here will match with the data you will use in the following steps creating a database
-- This File is referenced in class `PostgresDatasource.java` in line #14
-  > **Note:** Find detailed information what is done here: https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-configure-a-datasource
-  > The Section '9.1. Configure a Custom DataSource' contains all information required, also what happens in file `src/main/resources/application.yml` search in the spring docs for "app.datasource.jdbc-url=jdbc:mysql://localhost/test" to navigate to the correct position
-  > Flyway comes as an out-of-the-box integration plugin, find more details here: https://flywaydb.org/documentation/plugins/springboot
+- Database connection properties are in `src/main/resources/application.yml`
+- Ensure these properties match your PostgreSQL setup:
+  ```yaml
+  app:
+    datasource:
+      jdbc-url: jdbc:postgresql://localhost:5432/coin
+      username: postgres
+      password: password
+      pool-size: 30
+  ```
+- This configuration is used in `PostgresDatasource.java`
+- For more details on custom DataSource configuration, refer to the [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-configure-a-datasource)
 
 ### [INFO] Create or Update a DB Table within your IDE
 
 1. Create folders `db/migration` within `src/main/resources` in the project.
 2. Create a File named `V1__<Some Name>Table.sql`
-   > **Note:** By default, Flyway looks at files in the format V$X__$DESCRIPTION.sql, where $X is the migration version name, in folder src/main/resources/db/migration.
+   > **Note:** By default, Flyway looks at files in the format `V{VERSION_NUMBER}__{DESCRRIPTION}.sql`, for example `V3__ADD_NEW_CRYPTO`, in folder src/main/resources/db/migration.
    > Go to https://flywaydb.org/documentation/api/ to find more details
 3. Insert the following SQL command
    `CREATE TABLE coin ( id UUID NOT NULL PRIMARY KEY, name VARCHAR(100) NOT NULL );`
