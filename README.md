@@ -8,9 +8,20 @@
   - This Maven-based Spring Boot backend application shall provide a REST API that handles CRUD operations persisted in a PostgreSQL database for Cryptocurrency information such as price performance over time
   - For price updates, a separate crypto client is in place (the client is covered separately), which serves as the man in the middle between the cryptocurrency web service (in this case, coingecko.com) and this Spring Boot backend server
 
+## Technology Stack
+- Java 21 (Eclipse Temurin)
+- Spring Boot 3.3.3
+- PostgreSQL
+- Flyway for database migrations
+- Spring JDBC with JdbcTemplate
+- HikariCP for connection pooling
+- Lombok for reducing boilerplate code
+- SpringDoc OpenAPI for API documentation
+- Docker for containerization
+
 > **Note:** In case there are any compile issues, I used [Eclispe Temurin Java 21 LTS](https://adoptium.net/de/temurin/releases/) for this application.
 
-> **Note:** The following description contains the steps you need to take starting the application and also helpful background information, which I prefix with [INFO], essential steps you need to take care of are highlighted with [IMPORTANT]
+> **Note:** The following description contains essential steps for starting the application and helpful background information. Essential steps are highlighted with [IMPORTANT].
 
 ## Prerequisites
 
@@ -74,6 +85,10 @@
     ```
     Or simply import it into your IDE and start it there. It will run at port 8080.    
 
+7. [IMPORTANT] Monitor Flyway migrations:
+- Check application logs for Flyway-related messages during startup.
+- After startup, you can verify migrations by checking the `flyway_schema_history` table in your database.
+
 ## Set Up Grafana
 
 1. Open Grafana in your browser `localhost:3000` and login (usually the initial access it's user: admin, pw: admin)
@@ -103,6 +118,10 @@
 
 The API should now be running on `http://localhost:8080`. You can use tools like Postman or curl to interact with the endpoints defined in your controllers.
 
+To explore and test the API:
+1. Access the Swagger UI at `http://localhost:8080/api-docs`
+2. Use the interactive documentation to understand and test the available endpoints.
+
 ## Stopping the Application
 
 1. Stop the Spring Boot application (Ctrl+C in the terminal where it's running)
@@ -113,8 +132,9 @@ The API should now be running on `http://localhost:8080`. You can use tools like
 
 ## Additional Notes
 
-- The specific table structures and schemas will be created by your Spring Boot application using JPA/Hibernate when it first runs.
-- Make sure your `application.yml` or `application.properties` file in the Spring Boot project is configured to connect to the PostgreSQL database:
+- The database schema is managed by Flyway migrations. Migration scripts are located in `src/main/resources/db/migration`.
+- Separate tables are used for different cryptocurrencies (e.g., ethereum, algorand, etc.).
+- The `application.yml` file in the Spring Boot project is configured to connect to the PostgreSQL database and manage Flyway migrations:
 
   ```yaml
     app:
@@ -126,6 +146,37 @@ The API should now be running on `http://localhost:8080`. You can use tools like
   ```
 
 - If you need to make any manual changes to the database schema or add initial data, you can do so by connecting to the database using the steps 4-8 above.
+
+## Development Guidelines
+
+### Adding New Database Migrations
+1. Create a new SQL file in `src/main/resources/db/migration`
+2. Name it following the pattern `V<version>__<description>.sql` (e.g., `V2__Add_New_Coin_Table.sql`)
+3. Write your SQL migration script
+4. The migration will be automatically applied on the next application startup
+
+### Using JdbcTemplate for Database Operations
+- Inject `JdbcTemplate` into your repository classes
+- Use `JdbcTemplate` methods for querying and modifying data
+- Example:
+  ```java
+  @Repository
+  public class CoinRepositoryImpl implements CoinRepository {
+      private final JdbcTemplate jdbcTemplate;
+
+      public CoinRepositoryImpl(JdbcTemplate jdbcTemplate) {
+          this.jdbcTemplate = jdbcTemplate;
+      }
+
+      // Use jdbcTemplate for database operations
+  }
+  ```
+
+## Error Handling and Logging
+
+- Global exception handling is implemented in `GlobalExceptionHandler.java`
+- Logging is configured in `logback-spring.xml`
+- Application logs can be found in the `logs` directory
 
 ### Starting the application
 

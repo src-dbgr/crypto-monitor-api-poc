@@ -33,11 +33,11 @@ public class CoinController {
         this.coinService = coinService;
     }
 
-    @Operation(summary = "Add a new coin")
+    @Operation(summary = "Add a new cryptocurrency coin")
     @ApiResponse(responseCode = "201", description = "Coin created")
     @PostMapping
     public ResponseEntity<SamApiResponse<Coin>> addCoin(@Valid @RequestBody Coin coin) {
-        logger.info("Received request to add new coin: {}", coin.getSymbol());
+        logger.info("Received request to add new cryptocurrency coin: {}", coin.getSymbol());
         Coin savedCoin = coinService.saveCoin(coin);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SamApiResponse<>(true, savedCoin, "Coin added successfully"));
@@ -47,7 +47,7 @@ public class CoinController {
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @GetMapping("/{coinId}")
     public ResponseEntity<SamApiResponse<List<Coin>>> getAllCoins(
-            @Parameter(name = "coinId", description = "ID of the coin", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency", required = true, example = "bitcoin")
             @PathVariable String coinId) {
         logger.info("Received request to get all coins for coinId: {}", coinId);
         List<Coin> coins = coinService.getAllCoins(coinId);
@@ -59,9 +59,9 @@ public class CoinController {
     @ApiResponse(responseCode = "404", description = "Coin not found")
     @GetMapping("/{coinId}/{id}")
     public ResponseEntity<SamApiResponse<Coin>> getCoinById(
-            @Parameter(name = "coinId", description = "ID of the coin type", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency type", required = true, example = "bitcoin")
             @PathVariable String coinId,
-            @Parameter(name = "id", description = "ID of the coin to retrieve", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+            @Parameter(name = "id", description = "ID of the cryptocurrency to retrieve", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID id) {
         logger.info("Received request to get coin with ID: {} for coinId: {}", id, coinId);
         Coin coin = coinService.getCoinById(coinId, id);
@@ -72,7 +72,7 @@ public class CoinController {
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @GetMapping("/{coinId}/date-range")
     public ResponseEntity<SamApiResponse<List<Coin>>> getCoinsByDateRange(
-            @Parameter(name = "coinId", description = "ID of the coin", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency", required = true, example = "bitcoin")
             @PathVariable String coinId,
             @Parameter(name = "startDate", description = "Start date", required = true, example = "2023-01-01")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
@@ -87,7 +87,7 @@ public class CoinController {
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @GetMapping("/count/{coinId}")
     public ResponseEntity<SamApiResponse<Long>> getCountByCoinId(
-            @Parameter(name = "coinId", description = "ID of the coin", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency", required = true, example = "bitcoin")
             @PathVariable String coinId) {
         logger.info("Received request to get count for coinId: {}", coinId);
         long count = coinService.getCountByCoinId(coinId);
@@ -99,9 +99,9 @@ public class CoinController {
     @ApiResponse(responseCode = "404", description = "Coin not found")
     @DeleteMapping("/{coinId}/{id}")
     public ResponseEntity<SamApiResponse<Void>> deleteCoin(
-            @Parameter(name = "coinId", description = "ID of the coin type", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency type", required = true, example = "bitcoin")
             @PathVariable String coinId,
-            @Parameter(name = "id", description = "ID of the coin to delete", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+            @Parameter(name = "id", description = "ID of the cryptocurrency to delete", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID id) {
         logger.info("Received request to delete coin with ID: {} for coinId: {}", id, coinId);
         coinService.deleteCoin(coinId, id);
@@ -112,7 +112,7 @@ public class CoinController {
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @GetMapping("/{coinId}/duplicates")
     public ResponseEntity<SamApiResponse<List<Coin>>> getAllDuplicatesWithSameDate(
-            @Parameter(name = "coinId", description = "ID of the coin", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency", required = true, example = "bitcoin")
             @PathVariable String coinId) {
         logger.info("Received request to get all duplicates with same date for coinId: {}", coinId);
         List<Coin> duplicates = coinService.getAllDuplicatesWithSameDate(coinId);
@@ -123,7 +123,7 @@ public class CoinController {
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @DeleteMapping("/{coinId}/duplicates")
     public ResponseEntity<SamApiResponse<Integer>> deleteDuplicatesWithSameDate(
-            @Parameter(name = "coinId", description = "ID of the coin", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency", required = true, example = "bitcoin")
             @PathVariable String coinId) {
         logger.info("Received request to delete duplicates with same date for coinId: {}", coinId);
         int deletedCount = coinService.deleteDuplicatesWithSameDate(coinId);
@@ -134,7 +134,7 @@ public class CoinController {
     @ApiResponse(responseCode = "200", description = "Successful operation")
     @GetMapping("/{coinId}/lastValidDate")
     public ResponseEntity<SamApiResponse<Date>> getLastValidDateForCoin(
-            @Parameter(name = "coinId", description = "ID of the coin", required = true, example = "bitcoin")
+            @Parameter(name = "coinId", description = "ID of the cryptocurrency", required = true, example = "bitcoin")
             @PathVariable String coinId,
             @Parameter(name = "sequenceLength", description = "Length of the consecutive day sequence (default is 10)", required = false, example = "5")
             @RequestParam(defaultValue = "10") int sequenceLength) {

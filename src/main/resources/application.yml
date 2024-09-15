@@ -8,3 +8,7 @@ app:
 springdoc:
   swagger-ui:
     path: /api-docs
+
+spring:
+  profiles:
+    active: dev
