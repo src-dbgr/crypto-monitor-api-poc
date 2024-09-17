@@ -1,5 +1,9 @@
-FROM adoptopenjdk:11-jre-openj9
-RUN mkdir /opt/app
-COPY target/docker-spring-boot.jar /opt/app
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY target/coin-exec.jar app.jar
+
 EXPOSE 8080
-CMD ["java", "-jar", "/opt/app/docker-spring-boot.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

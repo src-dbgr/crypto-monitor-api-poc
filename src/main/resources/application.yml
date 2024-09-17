@@ -1,8 +1,8 @@
 app:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/coin
-    username: postgres
-    password: password
+    jdbc-url: ${CRYPTO_API_DB_URL:jdbc:postgresql://localhost:5432/coin}
+    username: ${CRYPTO_API_DB_USERNAME:postgres}
+    password: ${CRYPTO_API_DB_PASSWORD:password}
     pool-size: 30
 
 springdoc:

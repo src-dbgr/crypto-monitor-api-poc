@@ -22,10 +22,6 @@
   "links": [],
   "panels": [
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -138,10 +134,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -410,10 +402,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -496,10 +484,6 @@
       "type": "bargauge"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -584,10 +568,6 @@
       "type": "bargauge"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -700,10 +680,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -816,10 +792,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {

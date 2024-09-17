@@ -14,9 +14,19 @@ import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler for the Coin API.
+ * Provides centralized exception handling across all @RequestMapping methods.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Handles CoinNotFoundException.
+     *
+     * @param ex The CoinNotFoundException.
+     * @return ResponseEntity with error details.
+     */
     @ExceptionHandler(CoinNotFoundException.class)
     public ResponseEntity<SamApiResponse<String>> handleCoinNotFoundException(CoinNotFoundException ex) {
         return ResponseEntity
@@ -24,6 +34,12 @@ public class GlobalExceptionHandler {
                 .body(new SamApiResponse<>(false, null, ex.getMessage()));
     }
 
+    /**
+     * Handles InvalidCoinDataException.
+     *
+     * @param ex The InvalidCoinDataException.
+     * @return ResponseEntity with error details.
+     */
     @ExceptionHandler(InvalidCoinDataException.class)
     public ResponseEntity<SamApiResponse<String>> handleInvalidCoinDataException(InvalidCoinDataException ex) {
         return ResponseEntity
@@ -31,6 +47,12 @@ public class GlobalExceptionHandler {
                 .body(new SamApiResponse<>(false, null, ex.getMessage()));
     }
 
+    /**
+     * Handles DuplicateCoinException.
+     *
+     * @param ex The DuplicateCoinException.
+     * @return ResponseEntity with error details.
+     */
     @ExceptionHandler(DuplicateCoinException.class)
     public ResponseEntity<SamApiResponse<String>> handleDuplicateCoinException(DuplicateCoinException ex) {
         return ResponseEntity
@@ -38,6 +60,12 @@ public class GlobalExceptionHandler {
                 .body(new SamApiResponse<>(false, null, ex.getMessage()));
     }
 
+    /**
+     * Handles MethodArgumentNotValidException.
+     *
+     * @param ex The MethodArgumentNotValidException.
+     * @return ResponseEntity with validation error details.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<SamApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
@@ -52,6 +80,12 @@ public class GlobalExceptionHandler {
                 .body(new SamApiResponse<>(false, errors, "Validation failed"));
     }
 
+    /**
+     * Handles ConstraintViolationException.
+     *
+     * @param ex The ConstraintViolationException.
+     * @return ResponseEntity with constraint violation details.
+     */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<SamApiResponse<String>> handleConstraintViolationException(
             ConstraintViolationException ex) {
@@ -60,6 +94,12 @@ public class GlobalExceptionHandler {
                 .body(new SamApiResponse<>(false, ex.getMessage(), "Constraint violation"));
     }
 
+    /**
+     * Handles DataAccessException.
+     *
+     * @param ex The DataAccessException.
+     * @return ResponseEntity with database error details.
+     */
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<SamApiResponse<String>> handleDataAccessException(
             DataAccessException ex) {
@@ -68,6 +108,12 @@ public class GlobalExceptionHandler {
                 .body(new SamApiResponse<>(false, "An error occurred while accessing the database", "Database error"));
     }
 
+    /**
+     * Handles all other uncaught exceptions.
+     *
+     * @param ex The Exception.
+     * @return ResponseEntity with generic error details.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<SamApiResponse<String>> handleGenericException(Exception ex) {
         return ResponseEntity
