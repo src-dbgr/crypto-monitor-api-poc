@@ -23,7 +23,7 @@ This application serves as a Proof of Concept (POC) with the following objective
 
 ### Architecture
 
-![Architecture](src/main/resources/Architecture.png)
+![Architecture](src/main/resources/Architecture-new.png)
 
 ## Technology Stack
 
