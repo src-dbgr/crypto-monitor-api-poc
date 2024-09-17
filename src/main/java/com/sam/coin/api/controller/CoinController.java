@@ -142,7 +142,6 @@ public class CoinController {
         return ResponseEntity.ok(new SamApiResponse<>(true, lastValidDate, "Last valid date retrieved successfully"));
     }
 
-    // Exception Handler
     @ExceptionHandler(CoinNotFoundException.class)
     public ResponseEntity<SamApiResponse<Void>> handleCoinNotFoundException(CoinNotFoundException e) {
         LOG.error("Coin not found exception: {}", e.getMessage());

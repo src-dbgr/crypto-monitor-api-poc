@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CoinRepository {
+
     /**
      * Saves a coin entity to the database.
      * If the coin's ID is null, a new UUID will be generated.

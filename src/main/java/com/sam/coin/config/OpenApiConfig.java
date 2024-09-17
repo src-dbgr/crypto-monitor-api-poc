@@ -25,6 +25,10 @@ public class OpenApiConfig {
                         .version("1.0")
                         .description("Sam's Crypto Coin API")
                         .termsOfService("http://swagger.io/terms/")
-                        .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+                        .license(new License()
+                                .name("Apache 2.0")
+                                .url("http://springdoc.org")
+                        )
+                );
     }
 }
