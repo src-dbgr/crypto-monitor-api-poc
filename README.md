@@ -51,7 +51,7 @@ This application serves as a Proof of Concept (POC) with the following objective
 1. Clone the repository
 2. Start the PostgreSQL database and pgAdmin:
    ```
-   docker-compose up -d
+   docker compose up -d
    ```
 3. Create the 'coin' database and set up the UUID extension (see [Database Setup](#database-setup) for detailed steps)
 4. Build the Spring Boot application from its root directory:
@@ -77,23 +77,19 @@ This application serves as a Proof of Concept (POC) with the following objective
    ```
    docker exec -it postgres-coin psql -U postgres
    ```
-3. Create the 'coin' database:
-   ```sql
-   CREATE DATABASE coin;
-   ```
-4. Connect to the 'coin' database:
+3. Connect to the 'coin' database:
    ```sql
    \c coin
    ```
-5. Create the UUID extension:
+4. Create the UUID extension:
    ```sql
    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
    ```
-6. Exit the PostgreSQL prompt:
+5. Exit the PostgreSQL prompt:
    ```
    \q
    ```
-7. Add sample data (optional):
+6. Add sample data (optional):
    ```
    cd crypto-monitoring-api-poc/misc/dbbackup
    unpack coinbackup.rar
@@ -163,7 +159,7 @@ Common PostgreSQL commands:
 
 ## Grafana Integration
 
-1. Start Grafana:
+1. Start Grafana (tested with v.11.0.0):
    ```
    docker run -d --name=grafana -p 3000:3000 grafana/grafana
    ```
@@ -171,7 +167,7 @@ Common PostgreSQL commands:
 3. Add PostgreSQL as a data source:
     - Host: `host.docker.internal:5432`
     - Database: `coin`
-    - User: `postgres`
+    - Username: `postgres`
     - Password: `password`
     - SSL Mode: `disable`
 4. Import dashboards from `misc/grafana/*.json`
