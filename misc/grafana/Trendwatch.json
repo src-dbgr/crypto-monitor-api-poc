@@ -22,10 +22,6 @@
   "links": [],
   "panels": [
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -203,10 +199,6 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "decimals": 4,
@@ -285,10 +277,6 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "decimals": 6,
@@ -831,10 +819,6 @@
       "type": "bargauge"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "decimals": 4,
@@ -920,10 +904,6 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "decimals": 5,
@@ -1010,10 +990,6 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -1093,10 +1069,6 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "cdxagc98c7hfkc"
-      },
       "fieldConfig": {
         "defaults": {
           "mappings": [],

@@ -1,5 +1,9 @@
-FROM eclipse-temurin:21-jdk
-RUN mkdir /opt/app
-COPY target/coin-exec.jar /opt/app
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY target/coin-exec.jar app.jar
+
 EXPOSE 8080
-CMD ["java", "-jar", "/opt/app/coin-exec.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
