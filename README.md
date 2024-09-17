@@ -69,7 +69,7 @@ This application serves as a Proof of Concept (POC) with the following objective
 
 ### Database Setup
 
-1. Start PostgreSQL container:
+1. Start the PostgreSQL database and pgAdmin:
    ```
    docker compose up -d
    ```
