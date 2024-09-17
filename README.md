@@ -248,3 +248,13 @@ public class CoinRepositoryImpl implements CoinRepository {
 ### Adding New Coin Data
 
 To add new cryptocurrency data, utilize the [crypto-client-poc](https://github.com/src-dbgr/crypto-client-poc).
+
+## Contact
+
+[devsam.io](https://devsam.io/contact/)
+
+Project Link: [crypto-monitor-api-poc](https://github.com/src-dbgr/crypto-monitor-api-poc)
+
+## Related Project
+
+This server application is tightly coupled with the [crypto-client-poc](https://github.com/src-dbgr/crypto-client-poc) project, which serves as a client to add new cryptocurrency data.
